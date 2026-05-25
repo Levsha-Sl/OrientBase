@@ -1,0 +1,34 @@
+Attribute VB_Name = "ModuleSheet"
+Public Function GetSheetByName(sheetName As String) As Worksheet
+    On Error Resume Next
+    Set GetSheetByName = ThisWorkbook.Worksheets(sheetName)
+    On Error Goto 0
+End Function
+
+Function GetSheetFromLink(cell As Range) As String
+    On Error Resume Next
+    GetSheetFromLink = Replace(Split(cell.Hyperlinks(1).SubAddress, "!")(0), "'", "")
+    On Error Goto 0
+End Function
+
+Sub DeleteSheetIfExists(sName As String)
+    If sName = "" Then Exit Sub
+        If SheetExists(sName) Then Sheets(sName).Delete
+End Sub
+
+Function SheetExists(sName As String) As Boolean
+    Dim ws As Worksheet
+    On Error Resume Next
+    Set ws = ThisWorkbook.Worksheets(sName)
+    SheetExists = Not ws Is Nothing
+    On Error Goto 0
+End Function
+
+' TODO Debag
+Public Sub InitApp()
+    DataSheets.AllInit 
+    RankSheet.InitRanksSheet
+    ' Call BaseSheet.InitBase
+    ' Call ClubsSheet.InitClubsSheet
+    DataSheets.LoadAllDataToMarts
+End Sub
