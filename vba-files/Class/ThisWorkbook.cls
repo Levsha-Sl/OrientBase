@@ -78,55 +78,12 @@ Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
         End If
     End If
 
-    If Sh.name = "–азр€ды" Then 
-
-        ' TODO in RankSheet
-        RanksSheet.ChangesMart()
-        ' TODO export
-        If colIdx >= 1 And colIdx <= 3 And rowIdx >= 2 Then
-
+    If Sh.name = "–азр€ды" Then
+        Dim hasChangesMart As Boolean: hasChangesMart = RankSheet.ChangesMart(Target) 
+        If Not hasChangesMart Then
             Application.EnableEvents = False
-
-            Dim rankId As Variant, rankName As String, periodValue As Variant
-            Dim hasRankName As Boolean, hasPeriodValue As Boolean
-
-            rankId = Sh.Cells(rowIdx, 1).Value
-            rankName = Sh.Cells(rowIdx, 2).Value
-            periodValue = Sh.Cells(rowIdx, 3).Value
-
-            hasRankName = (rankName <> "")
-            hasPeriodValue = (periodValue <> "")
-
-            ' TODO update deleted(=Empty Ranks) insert to RanksData
-            Dim operation As String
-
-            ' ќпредел€ем операцию по состо€нию ID и данных
-            If rankId = "" Then
-                ' ID пуст: может быть INSERT если есть хот€ бы данные
-                If hasRankName Or hasPeriodValue Then
-                    operation = "INSERT"
-                Else
-                    ' ѕуста€ строка - ничего не делаем
-                    Application.EnableEvents = True
-                 Exit Sub
-                End If
-            Else
-                ' ID не пуст: UPDATE если данные есть, DELETE если нет
-                If hasRankName And hasPeriodValue Then
-                    operation = "UPDATE"
-                Elseif Not hasRankName And Not hasPeriodValue Then
-                    operation = "DELETE"
-                Else
-                    ' „астичные данные - ничего не делаем
-                    Application.EnableEvents = True
-                 Exit Sub
-                End If
-            End If
-            
+            Application.Undo
             Application.EnableEvents = True
-        
         End If
-        ' ELSE Application.Undo
-   
     End If
 End Sub
