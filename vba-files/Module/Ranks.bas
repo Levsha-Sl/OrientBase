@@ -28,17 +28,17 @@ Public Sub LoadToMart()
     Set RanksDict = CreateObject("Scripting.Dictionary")
     RanksDict.CompareMode = 1
 
-    Dim data As Variant: data = getRanksData()
-    MaxId = UBound(data, 1)
+    Dim ranks As Variant: ranks = getRanks()
+    MaxId = UBound(ranks, 1)
     ReDim martArr(1 To MaxId, 1 To 3)
 
     Dim i As Long
     For i = 1 To MaxId
-        RanksKeys.Add i, data(i, 1)
-        RanksDict.Add data(i, 1), data(i, 2)
+        RanksKeys.Add i, ranks(i, 1)
+        RanksDict.Add ranks(i, 1), ranks(i, 2)
         martArr(i, 1) = i            ' ID
-        martArr(i, 2) = data(i, 1)   ' Rank
-        martArr(i, 3) = data(i, 2)   ' PeriodAge
+        martArr(i, 2) = ranks(i, 1)   ' Rank
+        martArr(i, 3) = ranks(i, 2)   ' PeriodAge
     Next i
 
     Application.EnableEvents = False
@@ -54,19 +54,19 @@ End Sub
 Public Sub SaveChanges()
     Dim totalRows As Long: totalRows = RanksDict.Count
     Dim totalCols As Long: totalCols = 2
-    Dim resultData As Variant: ReDim resultData(1 To totalRows, 1 To totalCols)
+    Dim resultRanks As Variant: ReDim resultRanks(1 To totalRows, 1 To totalCols)
 
     Dim i As Long
     For i = 1 To totalRows
-        resultData(i, 1) = RanksDict.Keys()(i - 1) ' Rank
-        resultData(i, 2) = RanksDict.Items()(i - 1) ' PeriodAge
+        resultRanks(i, 1) = RanksDict.Keys()(i - 1) ' Rank
+        resultRanks(i, 2) = RanksDict.Items()(i - 1) ' PeriodAge
     Next i
 
     If totalRows > 0 Then
         With wsRanksData
-            Dim lastRow As Long: lastRow = UBound(getRanksData, 1)
+            Dim lastRow As Long: lastRow = UBound(getRanks, 1)
             .Range("A1").Resize(lastRow, totalCols).ClearContents
-            .Range("A1").Resize(totalRows, totalCols).Value = resultData
+            .Range("A1").Resize(totalRows, totalCols).Value = resultRanks
         End With
     End If
     Call LoadToMart
@@ -127,8 +127,8 @@ Private Sub LoadPrimaryRanks()
     wsRanksData.Range("A1:B" &  rowsCount).Value =primaryRanks
 End Sub
 
-Private Function getRanksData() As Variant
+Private Function getRanks() As Variant
     Dim lastRow As Long, lastCol As Long
     lastRow = wsRanksData.Cells(wsRanksData.Rows.Count, 1).End(xlUp).Row
-    getRanksData = wsRanksData.Range(wsRanksData.Cells(1, 1), wsRanksData.Cells(lastRow, 2)).Value
+    getRanks = wsRanksData.Range(wsRanksData.Cells(1, 1), wsRanksData.Cells(lastRow, 2)).Value
 End Function

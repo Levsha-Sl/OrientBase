@@ -1,12 +1,12 @@
 Attribute VB_Name = "DataSheets"
 Public Sub AllInit()
-    Data.Init 'wsData
+    Base.Init 'wsBase
     Ranks.Init 'wsRanksData
     Clubs.Init 'wsClubsData
 End Sub
 
 Public Sub LoadAllDataToMarts()
-    ' TODO Data.LoadToMarts
+    ' TODO Call Base.LoadToMarts
     Call Ranks.LoadToMart
     ' TODO Clubs.LoadToMart
 End Sub

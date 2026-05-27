@@ -117,7 +117,7 @@ Public Sub ExportToCSV()
     Dim lastRow As Long, i As Long, j As Long
     Dim lineData As String, objStream As Object
 
-    filePath = Application.GetSaveAsFilename(InitialFileName:="data.csv", _
+    filePath = Application.GetSaveAsFilename(InitialFileName:="base.csv", _
     FileFilter:="CSV Files (*.csv), *.csv")
     If VarType(filePath) = vbBoolean Then Exit Sub
 

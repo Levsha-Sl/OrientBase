@@ -1,15 +1,15 @@
-Attribute VB_Name = "Data"
-Public wsData As Worksheet
-Public DataKeys As Object
+Attribute VB_Name = "Base"
+Public wsBase As Worksheet
+Public BaseKeys As Object
 
 Public Function Init() As Worksheet
-    If wsData Is Nothing Then
+    If wsBase Is Nothing Then
         ' (FNM BIRTH)key STAT DATESTAT DATEINS PERIOD
-        Set wsData = DataSheets.GetSheet("Data", 1)
-        Set DataKeys = CreateObject("Scripting.Dictionary")
+        Set wsBase = DataSheets.GetSheet("Base", 1)
+        Set BaseKeys = CreateObject("Scripting.Dictionary")
     End If
 
-    Set Init = wsData
+    Set Init = wsBase
 End Function
 
 ' TODO Import
@@ -21,19 +21,19 @@ Public Sub Export()
     Dim filePath As Variant
     Dim fNum As Integer
 
-    Dim dataArr As Variant
+    Dim baseArr As Variant
     Dim lastRow As Long, lastCol As Long: lastCol = 6 ' Фиксированное количество столбцов (FNM BIRTH STAT DATESTAT DATEINS PERIOD)
 
     ' Диалог
     filePath = Application.GetSaveAsFilename( _
-    InitialFileName:="data.csv", _
+    InitialFileName:="base.csv", _
     FileFilter:="CSV Files (*.csv), *.csv" _
     )
 
     If filePath = False Then Exit Sub
 
-        lastRow = wsData.Cells(wsData.Rows.Count, 1).End(xlUp).Row
-        dataArr = wsData.Range(wsData.Cells(1, 1), wsData.Cells(lastRow, lastCol)).Value
+        lastRow = wsBase.Cells(wsBase.Rows.Count, 1).End(xlUp).Row
+        baseArr = wsBase.Range(wsBase.Cells(1, 1), wsBase.Cells(lastRow, lastCol)).Value
 
         fNum = FreeFile
         Open filePath For Output As #fNum
@@ -46,7 +46,7 @@ Public Sub Export()
         For i = 1 To lastRow
             line = ""
             For j = 1 To lastCol
-                line = line & dataArr(i, j)
+                line = line & baseArr(i, j)
                 If j < lastCol Then line = line & ";"
                 Next j
                 Print #fNum, line
