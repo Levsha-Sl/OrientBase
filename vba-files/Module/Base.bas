@@ -1,15 +1,15 @@
 Attribute VB_Name = "Base"
-Public wsBase As Worksheet
+Public wsBaseData As Worksheet
 Public BaseKeys As Object
 
 Public Function Init() As Worksheet
-    If wsBase Is Nothing Then
+    If wsBaseData Is Nothing Then
         ' (FNM BIRTH)key STAT DATESTAT DATEINS PERIOD
-        Set wsBase = DataSheets.GetSheet("Base", 1)
+        Set wsBaseData = DataSheets.GetSheet("Base", 1)
         Set BaseKeys = CreateObject("Scripting.Dictionary")
     End If
 
-    Set Init = wsBase
+    Set Init = wsBaseData
 End Function
 
 ' TODO Import
@@ -25,15 +25,16 @@ Public Sub Export()
     Dim lastRow As Long, lastCol As Long: lastCol = 6 ' Фиксированное количество столбцов (FNM BIRTH STAT DATESTAT DATEINS PERIOD)
 
     ' Диалог
+    Dim dataTime As Date: dataTime = Now
     filePath = Application.GetSaveAsFilename( _
-    InitialFileName:="base.csv", _
+    InitialFileName:="base" & Format(dataTime, "_yyyymmdd_hhmmss") & ".csv", _
     FileFilter:="CSV Files (*.csv), *.csv" _
     )
 
     If filePath = False Then Exit Sub
 
-        lastRow = wsBase.Cells(wsBase.Rows.Count, 1).End(xlUp).Row
-        baseArr = wsBase.Range(wsBase.Cells(1, 1), wsBase.Cells(lastRow, lastCol)).Value
+        lastRow = wsBaseData.Cells(wsBaseData.Rows.Count, 1).End(xlUp).Row
+        baseArr = wsBaseData.Range(wsBaseData.Cells(1, 1), wsBaseData.Cells(lastRow, lastCol)).Value
 
         fNum = FreeFile
         Open filePath For Output As #fNum
