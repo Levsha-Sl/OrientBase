@@ -5,7 +5,7 @@ Public BaseKeys As Object
 Public Function Init() As Worksheet
     If wsBaseData Is Nothing Then
         ' (FNM BIRTH)key STAT DATESTAT DATEINS PERIOD
-        Set wsBaseData = DataSheets.GetSheet("Base", 1)
+        Set wsBaseData = DataSheets.GetSheet("Base", 2)
         Set BaseKeys = CreateObject("Scripting.Dictionary")
     End If
 

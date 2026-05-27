@@ -12,8 +12,7 @@ Private Function GetBaseSheet() As Worksheet
     Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName("База")
 
     If ws Is Nothing Then
-        Set ws = ThisWorkbook.Worksheets. _
-        Add(Before:=ThisWorkbook.Worksheets(2))
+        Set ws = ThisWorkbook.Worksheets. Add(Before:=ThisWorkbook.Worksheets(5))
         ws.Name = "База"
         ' Создаем заголовки
         ws.Range("A5:I5").Value = _

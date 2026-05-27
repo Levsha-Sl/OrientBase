@@ -12,7 +12,7 @@ End Function
 Public Function Init() As Worksheet
     If wsRanksData Is Nothing Then
         ' (STAT)key PERIODAGE
-        Set wsRanksData = DataSheets.GetSheet("Ranks", 2)
+        Set wsRanksData = DataSheets.GetSheet("Ranks", 1)
         If wsRanksData.Cells(1, 1).Value = "" Then 
             Call LoadPrimaryRanks
         End If
