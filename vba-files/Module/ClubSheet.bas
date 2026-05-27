@@ -92,7 +92,7 @@ End Function
 
 Private  Function UpdatePersonData(i As Long, personRow As Long)
     ' Обновляем данные по разряду и страховке, но только если формула вернула дату
-    If IsDate(ws.Cells(i, 5).Value) Or (RankSheet.GetRankValue(ws.Cells(i,3).Value) = 0) Then
+    If IsDate(ws.Cells(i, 5).Value) Or (RanksSheet.GetRankValue(ws.Cells(i,3).Value) = 0) Then
         wsBase.Cells(personRow, 3).Value = ws.Cells(i, 3).Value
         wsBase.Cells(personRow, 4).Value = ws.Cells(i, 4).Value
     End If

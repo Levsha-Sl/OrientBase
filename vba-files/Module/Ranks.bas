@@ -44,8 +44,8 @@ Public Sub LoadToMart()
     Application.EnableEvents = False
     Application.ScreenUpdating = False
 
-    RankSheet.wsRanks.Range("A2").Resize(MaxId, 3).Value = martArr
-    RankSheet.wsRanks.Columns("A:C").AutoFit
+    RanksSheet.wsRanks.Range("A2").Resize(MaxId, 3).Value = martArr
+    RanksSheet.wsRanks.Columns("A:C").AutoFit
 
     Application.EnableEvents = True
     Application.ScreenUpdating = True

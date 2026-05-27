@@ -79,7 +79,7 @@ Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
     End If
 
     If Sh.name = "Разряды" Then
-        Dim hasChangesMart As Boolean: hasChangesMart = RankSheet.ChangesMart(Target) 
+        Dim hasChangesMart As Boolean: hasChangesMart = RanksSheet.ChangesMart(Target) 
         If Not hasChangesMart Then
             Application.EnableEvents = False
             Application.Undo

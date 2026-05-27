@@ -175,7 +175,7 @@ Private Sub ProcessUpdatePerson(ws As Worksheet, wsN As Worksheet, bRow As Long,
         newStat = True
         needRow = True
         comment = "нужно зачетку"
-    Elseif (RankSheet.GetRankValue(bStat) > 0 And (bEndStat = "" Or bEndStat < Date)) Then
+    Elseif (RanksSheet.GetRankValue(bStat) > 0 And (bEndStat = "" Or bEndStat < Date)) Then
         needRow = True
         comment = "нужно зачетку"
     End If

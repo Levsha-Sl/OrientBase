@@ -27,7 +27,7 @@ End Function
 ' TODO Debag
 Public Sub InitApp()
     Call DataSheets.AllInit 
-    RankSheet.InitRanksSheet
+    RanksSheet.InitRanksSheet
     ' Call BaseSheet.InitBase
     ' Call ClubsSheet.InitClubsSheet
     DataSheets.LoadAllDataToMarts

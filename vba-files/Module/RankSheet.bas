@@ -1,8 +1,8 @@
-Attribute VB_Name = "RankSheet"
+Attribute VB_Name = "RanksSheet"
 Public wsRanks As Worksheet
 
 Public Sub InitRanksSheet()
-    Set wsRanks = RankSheet.GetRankSheet
+    Set wsRanks = RanksSheet.GetRanksSheet
 End Sub
 
 Public Function ChangesMart(Target As Range) As Boolean
@@ -53,7 +53,7 @@ Public Function ChangesMart(Target As Range) As Boolean
         Resume CleanExit
 End Function
 
-Private Function GetRankSheet() As Worksheet
+Private Function GetRanksSheet() As Worksheet
     On Error Goto ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
@@ -89,7 +89,7 @@ Private Function GetRankSheet() As Worksheet
             End With
         End If
 
-        Set GetRankSheet = ws
+        Set GetRanksSheet = ws
 
  CleanExit:
         Application.EnableEvents = True
