@@ -9,11 +9,12 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
 Private Sub Workbook_Open()
-    ModuleSheet.InitApp  
+    DataSheets.InitApp  
 End Sub
 
 Private Sub Workbook_SheetSelectionChange(Byval Sh As Object, Byval Target As Range)
     If Sh.name = "Клубы" Then
+        ' TODO переместить в клубы
         If Target.Column <> 5 Or Target.Count > 1 Then Exit Sub
             If Target.Value <> "УДАЛИТЬ КЛУБ" Or Target.row = 1 Then Exit Sub
 
@@ -36,21 +37,23 @@ Private Sub Workbook_SheetSelectionChange(Byval Sh As Object, Byval Target As Ra
 End Sub
 
 Private Sub Workbook_SheetFollowHyperlink(Byval Sh As Object, Byval Target As Hyperlink)
-    Dim sheetName As String
-    sheetName = Split(Target.SubAddress, "!")(0)
-    sheetName = Replace(sheetName, "'", "")
+    If Sh.name = "Клубы" Then
+        ' TODO переместить в клубы
+        Dim sheetName As String
+        sheetName = Split(Target.SubAddress, "!")(0)
+        sheetName = Replace(sheetName, "'", "")
 
-    If Not ModuleSheet.SheetExists(sheetName) Then
-        MsgBox "Лист [" & sheetName & "] не найден. Ссылка удалена.", vbExclamation
-        Target.Range.ClearContents
-    End If
+        If Not ModuleSheet.SheetExists(sheetName) Then
+            MsgBox "Лист [" & sheetName & "] не найден. Ссылка удалена.", vbExclamation
+            Target.Range.ClearContents
+        End If
 End Sub
 
 Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
-    Dim rowIdx As Long: rowIdx = Target.row
-    Dim colIdx As Long: colIdx = Target.Column
-
     If Sh.name = "База" Then
+        ' TODO переместить в базу
+        Dim rowIdx As Long: rowIdx = Target.row
+        Dim colIdx As Long: colIdx = Target.Column
         ' Проверяем, что изменение в пределах A-H и ниже заголовков
         If colIdx <= 8 And rowIdx >= 6 Then
 

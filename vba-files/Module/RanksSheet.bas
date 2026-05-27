@@ -1,7 +1,7 @@
 Attribute VB_Name = "RanksSheet"
 Public wsRanks As Worksheet
 
-Public Sub InitRanksSheet()
+Public Sub Init()
     Set wsRanks = RanksSheet.GetRanksSheet
 End Sub
 

@@ -23,12 +23,3 @@ Function SheetExists(sName As String) As Boolean
     SheetExists = Not ws Is Nothing
     On Error Goto 0
 End Function
-
-' TODO Debag
-Public Sub InitApp()
-    Call DataSheets.AllInit 
-    RanksSheet.InitRanksSheet
-    ' Call BaseSheet.InitBase
-    ' Call ClubsSheet.InitClubsSheet
-    DataSheets.LoadAllDataToMarts
-End Sub

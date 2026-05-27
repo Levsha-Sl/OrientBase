@@ -1,14 +1,27 @@
 Attribute VB_Name = "DataSheets"
+' TODO Debag
+Public Sub InitApp()
+    InitData
+    InitMarts
 
-Public Sub AllInit()
-    Base.Init 'wsBaseData
-    Ranks.Init 'wsRanksData
-    Clubs.Init 'wsClubsData
+    LoadAllDataToMarts
 End Sub
 
-Public Sub LoadAllDataToMarts()
-    ' TODO Call Base.LoadToMarts
-    Call Ranks.LoadToMart
+Private Sub InitData()
+    Ranks.Init  'wsRanksData
+    Base.Init   'wsBaseData
+    Clubs.Init  'wsClubsData
+End Sub
+
+Private Sub InitMarts()
+    RanksSheet.Init  'wsRanks
+    ' BaseSheet.Init 'wsBase
+    ' ClubsSheet.Init  'wsClubs
+End Sub
+
+Private Sub LoadAllDataToMarts()
+    Ranks.LoadToMart
+    ' TODO Base.LoadToMarts
     ' TODO Clubs.LoadToMart
 End Sub
 
