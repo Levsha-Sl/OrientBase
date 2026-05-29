@@ -14,7 +14,7 @@ Public Sub Init()
     Set wsBase = GetBaseSheet
 End Sub
 
-Public Function CalculateRankExpiry(Byval rankDate As Variant, Byval targetRank As String) As Variant
+Public Function CalculateRankExpiry(ByVal rankDate As Variant, ByVal targetRank As String) As Variant
     If IsEmpty(rankDate) Or rankDate = "" Or targetRank = "" Then
         CalculateRankExpiry = ""
      Exit Function
@@ -27,13 +27,13 @@ Public Function CalculateRankExpiry(Byval rankDate As Variant, Byval targetRank 
 
     On Error Resume Next
     Dim addedYears As Long
-    addedYears = Ranks.GetRankValue(targetRank)
+    addedYears = ranks.GetRankValue(targetRank)
     If Err.Number <> 0 Then
         CalculateRankExpiry = CVErr(xlErrValue)
         Err.Clear
      Exit Function
     End If
-    On Error Goto 0
+    On Error GoTo 0
 
         If addedYears <= 0 Then
             CalculateRankExpiry = ""
@@ -43,7 +43,7 @@ Public Function CalculateRankExpiry(Byval rankDate As Variant, Byval targetRank 
         CalculateRankExpiry = DateAdd("yyyy", addedYears, CDate(rankDate)) - 1
 End Function
 
-Public Function CalculateInsuranceExpiry(Byval insDate As Variant, Byval period As Variant) As Variant
+Public Function CalculateInsuranceExpiry(ByVal insDate As Variant, ByVal period As Variant) As Variant
     If IsEmpty(insDate) Or insDate = "" Or IsEmpty(period) Or period = "" Then
         CalculateInsuranceExpiry = ""
      Exit Function
@@ -63,8 +63,8 @@ Public Function CalculateInsuranceExpiry(Byval insDate As Variant, Byval period 
 End Function
 
 Public Function ChangesMart(Target As Range) As Boolean
-    On Error Goto ErrorHandler
-        Dim result As Boolean: result = True
+    On Error GoTo ErrorHandler
+        Dim Result As Boolean: Result = True
         Dim rowIdx As Long: rowIdx = Target.row
         Dim colIdx As Long: colIdx = Target.Column
 
@@ -92,30 +92,30 @@ Public Function ChangesMart(Target As Range) As Boolean
                 ' ID пуст: INSERT если есть все данные
                 If hasData Then
                     wsBase.Cells(rowIdx, 1).Value = Base.CreateBase(fnm, birth, stat, dateStat, dateIns, period, timeStamp)
-                    wsBase.Cells(rowIdx,10).Value = timeStamp
+                    wsBase.Cells(rowIdx, 10).Value = timeStamp
                 End If
             Else
                 ' ID не пуст: UPDATE если данные есть, DELETE если нет
                 If hasData Then
                     Call Base.UpdateBase(fnm, birth, stat, dateStat, dateIns, period, timeStamp, baseId)
-                    wsBase.Cells(rowIdx,10).Value = timeStamp
+                    wsBase.Cells(rowIdx, 10).Value = timeStamp
                 Else
                     wsBase.Cells(rowIdx, 1).Value = IIf(Base.DeleteBase(baseId), "", baseId)
                 End If
             End If
         End If
- CleanExit:
-        ChangesMart = result
+CleanExit:
+        ChangesMart = Result
         Application.EnableEvents = True
      Exit Function
- ErrorHandler:
+ErrorHandler:
         Select Case Err.Number
          Case vbObjectError + 1201
             MsgBox Err.Description, vbExclamation, "Ошибка изменения данных"
          Case Else
             MsgBox "Произошла ошибка при сохранении изменений: " & Err.Description, vbCritical, "Ошибка"
         End Select
-        result = False
+        Result = False
         Resume CleanExit
 End Function
 
@@ -133,17 +133,17 @@ Public Sub AcceptBaseData(martArr As Variant)
 End Sub
 
 Private Function GetBaseSheet() As Worksheet
-    On Error Goto ErrorHandler
+    On Error GoTo ErrorHandler
         Application.EnableEvents = False
-        Application.ScreenUpdating = False       
+        Application.ScreenUpdating = False
         Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName("База")
 
         If ws Is Nothing Then
-            Set ws = ThisWorkbook.Worksheets. Add(Before:=ThisWorkbook.Worksheets(2))
+            Set ws = ThisWorkbook.Worksheets.Add(Before:=ThisWorkbook.Worksheets(2))
 
             With ws
-                .Name = "База"
-                .Range("A5:J5").Value = Array("id","ФИО", "День рож.", COL_RANK, COL_RANK_DATE, COL_RANK_EXPIRY, COL_INS_DATE, COL_PERIOD, COL_INS_EXPIRY, COL_TIME_STEMP)
+                .name = "База"
+                .Range("A5:J5").Value = Array("id", "ФИО", "День рож.", COL_RANK, COL_RANK_DATE, COL_RANK_EXPIRY, COL_INS_DATE, COL_PERIOD, COL_INS_EXPIRY, COL_TIME_STEMP)
 
                 With .Range("A5:J5")
                     .Font.Bold = True
@@ -152,14 +152,14 @@ Private Function GetBaseSheet() As Worksheet
                 With .Columns("A:J")
                     .AutoFit
                     .HorizontalAlignment = xlLeft
-                End With       
+                End With
 
-                Dim btnSave As Object: Set btnSave = ws.Buttons.Add( _
+                Dim BtnSave As Object: Set BtnSave = ws.Buttons.Add( _
                 Left:=ws.Cells(1, 5).Left, _
                 Top:=ws.Cells(1, 5).Top, _
                 Width:=ws.Cells(1, 5).Width + ws.Cells(1, 6).Width, _
                 Height:=ws.Cells(1, 1).Height)
-                With btnSave
+                With BtnSave
                     .OnAction = "BaseSheet.BtnSave"
                     .Caption = "Сохранить"
                 End With
@@ -168,17 +168,17 @@ Private Function GetBaseSheet() As Worksheet
         End If
 
         Set GetBaseSheet = ws
- CleanExit:
+CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
      Exit Function
- ErrorHandler:
+ErrorHandler:
         MsgBox "Ошибка при создании листа спортсменнов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function
 
 Private Sub BtnSave()
-    If Not tblBase.DataBodyRange Is Nothing Then 
+    If Not tblBase.DataBodyRange Is Nothing Then
         tblBase.DataBodyRange.Delete
     End If
     Call Base.SaveChanges
@@ -190,7 +190,7 @@ Private Function GetTableBase() As ListObject
     If tbl Is Nothing Then
         Set tbl = wsBase.ListObjects.Add(xlSrcRange, wsBase.Range("A5:J" & (5 + Base.getMaxId)), , xlYes)
         With tbl
-            .Name = "List sportsman"
+            .name = "List sportsman"
             .ShowTableStyleRowStripes = False
 
             .ListColumns(3).Range.NumberFormat = "dd.mm.yyyy"
@@ -211,9 +211,9 @@ Private Function GetTableBase() As ListObject
             Dim colInsExpiry As String
             Dim colTimeStamp As String
 
-            Set rngStat = wsBase.Range( tbl.ListColumns(COL_RANK).DataBodyRange, tbl.ListColumns(COL_RANK_EXPIRY).DataBodyRange)
-            Set rngIns = wsBase.Range( tbl.ListColumns(COL_INS_DATE).DataBodyRange, tbl.ListColumns(COL_INS_EXPIRY).DataBodyRange)
-            firstRow = tbl.DataBodyRange.Row
+            Set rngStat = wsBase.Range(tbl.ListColumns(COL_RANK).DataBodyRange, tbl.ListColumns(COL_RANK_EXPIRY).DataBodyRange)
+            Set rngIns = wsBase.Range(tbl.ListColumns(COL_INS_DATE).DataBodyRange, tbl.ListColumns(COL_INS_EXPIRY).DataBodyRange)
+            firstRow = tbl.DataBodyRange.row
 
             colRank = Split(tbl.ListColumns(COL_RANK).DataBodyRange.Cells(1).Address, "$")(1)
             colRankExpiry = Split(tbl.ListColumns(COL_RANK_EXPIRY).DataBodyRange.Cells(1).Address, "$")(1)
@@ -221,25 +221,25 @@ Private Function GetTableBase() As ListObject
             colTimeStamp = Split(tbl.ListColumns(COL_TIME_STEMP).DataBodyRange.Cells(1).Address, "$")(1)
 
             With rngStat
-                Dim ranksVlookup As String: ranksVlookup = "ВПР($" & colRank & firstRow & ";Ranks!$A$1:$B$" & Ranks.getMaxId & ";2;0)"
+                Dim ranksVlookup As String: ranksVlookup = "ВПР($" & colRank & firstRow & ";Ranks!$A$1:$B$" & ranks.getMaxId & ";2;0)"
 
                 .FormatConditions.Delete
                 ' Красное (просрочено или пусто)
-                With .FormatConditions.Add( Type:=xlExpression, _
-                    Formula1:="=И(" & ranksVlookup &"<>0;" & _
+                With .FormatConditions.Add(Type:=xlExpression, _
+                    Formula1:="=И(" & ranksVlookup & "<>0;" & _
                     "ИЛИ($" & colRankExpiry & firstRow & "<=СЕГОДНЯ();" & _
                     "$" & colRankExpiry & firstRow & "=""""))")
                     .Interior.Color = RGB(192, 0, 0)
                     .Font.Color = vbWhite
                 End With
                 ' Жёлтое (0–10 дней)
-                With .FormatConditions.Add( Type:=xlExpression, _
+                With .FormatConditions.Add(Type:=xlExpression, _
                     Formula1:="=И($" & colRankExpiry & firstRow & ">=СЕГОДНЯ();" & _
                     "$" & colRankExpiry & firstRow & "<=СЕГОДНЯ()+10)")
                     .Interior.Color = RGB(255, 192, 0)
                 End With
                 ' Зелёное (>10 дней и недавно изменено)
-                With .FormatConditions.Add( Type:=xlExpression, _
+                With .FormatConditions.Add(Type:=xlExpression, _
                     Formula1:="=И($" & colRankExpiry & firstRow & ">СЕГОДНЯ()+10;" & _
                     "$" & colTimeStamp & firstRow & ">=СЕГОДНЯ()-3)")
                     .Interior.Color = RGB(146, 208, 80)
@@ -249,19 +249,19 @@ Private Function GetTableBase() As ListObject
             With rngIns
                 .FormatConditions.Delete
                 ' Красное
-                With .FormatConditions.Add( Type:=xlExpression, _
+                With .FormatConditions.Add(Type:=xlExpression, _
                     Formula1:="=ИЛИ($" & colInsExpiry & firstRow & "<=СЕГОДНЯ();" & _
                     "$" & colInsExpiry & firstRow & "="""")")
                     .Interior.Color = RGB(255, 192, 192)
                 End With
                 ' Жёлтое
-                With .FormatConditions.Add( Type:=xlExpression, _
+                With .FormatConditions.Add(Type:=xlExpression, _
                     Formula1:="=И($" & colInsExpiry & firstRow & ">=СЕГОДНЯ();" & _
                     "$" & colInsExpiry & firstRow & "<=СЕГОДНЯ()+10)")
                     .Interior.Color = RGB(255, 255, 153)
                 End With
                 ' Зелёное
-                With .FormatConditions.Add( Type:=xlExpression, _
+                With .FormatConditions.Add(Type:=xlExpression, _
                     Formula1:="=И($" & colInsExpiry & firstRow & ">СЕГОДНЯ()+10;" & _
                     "$" & colTimeStamp & firstRow & ">=СЕГОДНЯ()-3)")
                     .Interior.Color = RGB(146, 208, 80)
@@ -295,7 +295,7 @@ Public Sub ExportToCSV()
         objStream.Charset = "utf-8"
         objStream.Open
 
-        lastRow = wsBase.Cells(wsBase.Rows.Count, "A").End(xlUp).Row
+        lastRow = wsBase.Cells(wsBase.Rows.Count, "A").End(xlUp).row
 
         ' Сохраняем с 5 строки (заголовки + данные)
         For i = 5 To lastRow
@@ -343,16 +343,16 @@ Public Sub ImportCSVToExcel()
                     cols = Split(lineData, ";") ' Жестко заданный разделитель
 
                     ' Находим место для вставки
-                    lastRow = wsBase.Cells(wsBase.Rows.Count, "A").End(xlUp).Row + 1
+                    lastRow = wsBase.Cells(wsBase.Rows.Count, "A").End(xlUp).row + 1
                     If lastRow < 6 Then lastRow = 6
 
-                        wsBase.Cells(lastRow,1).Value = Trim(cols(0))
-                        wsBase.Cells(lastRow,2).Value = Trim(cols(1))
-                        wsBase.Cells(lastRow,3).Value = Trim(cols(2))
-                        wsBase.Cells(lastRow,4).Value = Trim(cols(3))
+                        wsBase.Cells(lastRow, 1).Value = Trim(cols(0))
+                        wsBase.Cells(lastRow, 2).Value = Trim(cols(1))
+                        wsBase.Cells(lastRow, 3).Value = Trim(cols(2))
+                        wsBase.Cells(lastRow, 4).Value = Trim(cols(3))
 
-                        wsBase.Cells(lastRow,6).Value = Trim(cols(4))
-                        wsBase.Cells(lastRow,7).Value = Trim(cols(5))
+                        wsBase.Cells(lastRow, 6).Value = Trim(cols(4))
+                        wsBase.Cells(lastRow, 7).Value = Trim(cols(5))
 
                     End If
                 Loop

@@ -6,8 +6,8 @@ Public Sub Init()
 End Sub
 
 Public Function ChangesMart(Target As Range) As Boolean
-    On Error Goto ErrorHandler
-        Dim result As Boolean: result = True
+    On Error GoTo ErrorHandler
+        Dim Result As Boolean: Result = True
         Dim rowIdx As Long: rowIdx = Target.row
         Dim colIdx As Long: colIdx = Target.Column
 
@@ -27,44 +27,44 @@ Public Function ChangesMart(Target As Range) As Boolean
             If Not hasId Then
                 ' ID пуст: INSERT если есть все данные
                 If hasData Then
-                    wsRanks.Cells(rowIdx, 1).Value = Ranks.CreateRank(rankName, periodValue) 
+                    wsRanks.Cells(rowIdx, 1).Value = ranks.CreateRank(rankName, periodValue)
                 End If
             Else
                 ' ID не пуст: UPDATE если данные есть, DELETE если нет
                 If hasData Then
-                    Call Ranks.UpdateRank(rankName, periodValue, rankId)
+                    Call ranks.UpdateRank(rankName, periodValue, rankId)
                 Else
-                    wsRanks.Cells(rowIdx, 1).Value = IIf(Ranks.DeleteRank(rankId), "", rankId) 
+                    wsRanks.Cells(rowIdx, 1).Value = IIf(ranks.DeleteRank(rankId), "", rankId)
                 End If
             End If
         End If
- CleanExit:
-        ChangesMart = result
+CleanExit:
+        ChangesMart = Result
         Application.EnableEvents = True
      Exit Function
- ErrorHandler:
+ErrorHandler:
         Select Case Err.Number
          Case vbObjectError + 1101
             MsgBox Err.Description, vbExclamation, "Ошибка изменения данных"
          Case Else
             MsgBox "Произошла ошибка при сохранении изменений: " & Err.Description, vbCritical, "Ошибка"
         End Select
-        result = False
+        Result = False
         Resume CleanExit
 End Function
 
 Private Function GetRanksSheet() As Worksheet
-    On Error Goto ErrorHandler
+    On Error GoTo ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
 
         Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName("Разряды")
 
         If ws Is Nothing Then
-            Set ws = ThisWorkbook.Worksheets. Add(Before:=ThisWorkbook.Worksheets(1))
+            Set ws = ThisWorkbook.Worksheets.Add(Before:=ThisWorkbook.Worksheets(1))
 
             With ws
-                .Name = "Разряды"
+                .name = "Разряды"
                 .Range("A1:C1").Value = [{"ID","Разряд","Период (.г)"}]
 
                 With .Range("A1:C1")
@@ -77,12 +77,12 @@ Private Function GetRanksSheet() As Worksheet
                     .HorizontalAlignment = xlLeft
                 End With
 
-                Dim btnSave As Object: Set btnSave = ws.Buttons.Add( _
+                Dim BtnSave As Object: Set BtnSave = ws.Buttons.Add( _
                 Left:=ws.Cells(1, 5).Left, _
                 Top:=ws.Cells(1, 5).Top, _
                 Width:=ws.Cells(1, 5).Width + ws.Cells(1, 6).Width, _
                 Height:=ws.Cells(1, 1).Height)
-                With btnSave
+                With BtnSave
                     .OnAction = "RanksSheet.BtnSave"
                     .Caption = "Сохранить"
                 End With
@@ -91,16 +91,16 @@ Private Function GetRanksSheet() As Worksheet
 
         Set GetRanksSheet = ws
 
- CleanExit:
+CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
      Exit Function
- ErrorHandler:
+ErrorHandler:
         MsgBox "Ошибка при создании листа разрядов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function
 
 Private Sub BtnSave()
-    wsRanks.Range("A2").Resize(Ranks.getMaxId(), 3).ClearContents
-    Call Ranks.SaveChanges
+    wsRanks.Range("A2").Resize(ranks.getMaxId(), 3).ClearContents
+    Call ranks.SaveChanges
 End Sub

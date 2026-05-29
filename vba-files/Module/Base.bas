@@ -15,7 +15,7 @@ Public Function Init() As Worksheet
     If wsBaseData Is Nothing Then
         ' (FNM BIRTH)key STAT DATESTAT DATEINS PERIOD
         Set wsBaseData = DataSheets.GetSheet("Base")
-        If wsBaseData.Cells(1, 1).Value = "" Then 
+        If wsBaseData.Cells(1, 1).Value = "" Then
             Call LoadPrimaryBase
         End If
     End If
@@ -94,7 +94,7 @@ Public Sub UpdateBase(fnm As String, birth As Date, stat As String, dateStat As 
         If oldKey <> newKey Then
             ' Ключ изменился - удаляем старый, добавляем новый
             BaseKeys(id) = newKey
-            BaseDict.Key(oldKey) = newKey
+            BaseDict.key(oldKey) = newKey
         End If
 
         BaseDict.Item(newKey) = Array(stat, dateStat, dateIns, period, timeStamp)
@@ -106,15 +106,15 @@ End Sub
 Public Function DeleteBase(id As Long) As Boolean
     If BaseKeys.Exists(id) Then
         Dim key As String: key = BaseKeys(id)
-        If BaseDict.Exists(key) Then 
+        If BaseDict.Exists(key) Then
             BaseDict.Remove key
             BaseKeys.Remove id
         Else
             Err.Raise vbObjectError + 1201, "DeleteBase", "Спортсмен с таким наименованием не найден"
         End If
-    Else 
+    Else
         Err.Raise vbObjectError + 1201, "DeleteBase", "Спортсмен с таким ID не найден"
-    End If 
+    End If
     DeleteBase = True
 End Function
 
@@ -161,7 +161,7 @@ Public Sub Export()
 
     If filePath = False Then Exit Sub
 
-        lastRow = wsBaseData.Cells(wsBaseData.Rows.Count, 1).End(xlUp).Row
+        lastRow = wsBaseData.Cells(wsBaseData.Rows.Count, 1).End(xlUp).row
         baseArr = wsBaseData.Range(wsBaseData.Cells(1, 1), wsBaseData.Cells(lastRow, TotalCols)).Value
 
         fNum = FreeFile
@@ -192,6 +192,6 @@ End Sub
 
 Private Function GetBaseData() As Variant
     Dim lastRow As Long, lastCol As Long
-    lastRow = wsBaseData.Cells(wsBaseData.Rows.Count, 1).End(xlUp).Row
+    lastRow = wsBaseData.Cells(wsBaseData.Rows.Count, 1).End(xlUp).row
     GetBaseData = wsBaseData.Range(wsBaseData.Cells(1, 1), wsBaseData.Cells(lastRow, TotalCols)).Value
 End Function

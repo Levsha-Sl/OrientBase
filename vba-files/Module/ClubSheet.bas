@@ -6,7 +6,7 @@ Public Function GetClubSheet(clubIndex As Long, mode As String, dataTime As Date
     (After:=ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count))
     ' Имя листа: L1_2204_1530 (Коротко и уникально)
 
-    ws.Name = IIf(mode = "List", "L", "N") & clubIndex & "_" & Format(dataTime, "ddmm_hhmmss")
+    ws.name = IIf(mode = "List", "L", "N") & clubIndex & "_" & Format(dataTime, "ddmm_hhmmss")
 
     ' ШАПКА ЛИСТА
     ws.Range("A1").Value = "Клуб: " & clubFullName
@@ -48,7 +48,7 @@ Sub LoadCurrentListToBase()
 
     Application.ScreenUpdating = False
 
-    Dim lastRow As Long: lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    Dim lastRow As Long: lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).row
 
     Dim i As Long
     For i = 5 To lastRow
@@ -63,7 +63,7 @@ Sub LoadCurrentListToBase()
                 i = i + 1 ' Переходим на вторую строку, где могут быть новые данные
                 Dim personRow As Long: personRow = BaseSheet.PersonExists(fio, bd)
                 If personRow = 0 Then
-                    Dim baseLastRow As Long: baseLastRow = wsBase.Cells(wsBase.Rows.Count, 1).End(xlUp).Row + 1
+                    Dim baseLastRow As Long: baseLastRow = wsBase.Cells(wsBase.Rows.Count, 1).End(xlUp).row + 1
 
                     wsBase.Cells(baseLastRow, 1).Value = fio
                     wsBase.Cells(baseLastRow, 2).Value = bd
@@ -84,15 +84,15 @@ Sub LoadCurrentListToBase()
     MsgBox "Данные с листа загружены в базу", vbInformation
 End Sub
 
-Private  Function NeedToUpdate(row As Long) As Boolean
+Private Function NeedToUpdate(row As Long) As Boolean
     NeedToUpdate = ws.Cells(row + 1, 1).Value = "" And _
     ws.Cells(row + 1, 2).Value = "" And _
     ws.Cells(row + 1, 3).Value <> ""
 End Function
 
-Private  Function UpdatePersonData(i As Long, personRow As Long)
+Private Function UpdatePersonData(i As Long, personRow As Long)
     ' Обновляем данные по разряду и страховке, но только если формула вернула дату
-    If IsDate(ws.Cells(i, 5).Value) Or (RanksSheet.GetRankValue(ws.Cells(i,3).Value) = 0) Then
+    If IsDate(ws.Cells(i, 5).Value) Or (RanksSheet.GetRankValue(ws.Cells(i, 3).Value) = 0) Then
         wsBase.Cells(personRow, 3).Value = ws.Cells(i, 3).Value
         wsBase.Cells(personRow, 4).Value = ws.Cells(i, 4).Value
     End If

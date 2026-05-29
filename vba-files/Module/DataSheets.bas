@@ -8,9 +8,9 @@ Public Sub InitApp()
 End Sub
 
 Private Sub InitData()
-    Ranks.Init  'wsRanksData
+    ranks.Init  'wsRanksData
     Base.Init   'wsBaseData
-    Clubs.Init  'wsClubsData
+    clubs.Init  'wsClubsData
 End Sub
 
 Private Sub InitMarts()
@@ -20,7 +20,7 @@ Private Sub InitMarts()
 End Sub
 
 Private Sub LoadAllDataToMarts()
-    Ranks.LoadToMart
+    ranks.LoadToMart
     Base.LoadToMart
     ' TODO Clubs.LoadToMart
 End Sub
@@ -30,7 +30,7 @@ Public Function GetSheet(name As String) As Worksheet
     If ws Is Nothing Then
         Set ws = ThisWorkbook.Worksheets. _
         Add(Before:=ThisWorkbook.Worksheets(1))
-        ws.Name = name
+        ws.name = name
         ws.Visible = xlSheetVeryHidden
     End If
 

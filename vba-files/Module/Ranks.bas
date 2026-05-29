@@ -13,7 +13,7 @@ Public Function Init() As Worksheet
     If wsRanksData Is Nothing Then
         ' (STAT)key PERIODAGE
         Set wsRanksData = DataSheets.GetSheet("Ranks")
-        If wsRanksData.Cells(1, 1).Value = "" Then 
+        If wsRanksData.Cells(1, 1).Value = "" Then
             Call LoadPrimaryRanks
         End If
     End If
@@ -53,8 +53,8 @@ End Sub
 
 Public Sub SaveChanges()
     Dim totalRows As Long: totalRows = RanksDict.Count
-    Dim totalCols As Long: totalCols = 2
-    Dim resultRanks As Variant: ReDim resultRanks(1 To totalRows, 1 To totalCols)
+    Dim TotalCols As Long: TotalCols = 2
+    Dim resultRanks As Variant: ReDim resultRanks(1 To totalRows, 1 To TotalCols)
 
     Dim i As Long
     For i = 1 To totalRows
@@ -65,19 +65,19 @@ Public Sub SaveChanges()
     If totalRows > 0 Then
         With wsRanksData
             Dim lastRow As Long: lastRow = UBound(getRanks, 1)
-            .Range("A1").Resize(lastRow, totalCols).ClearContents
-            .Range("A1").Resize(totalRows, totalCols).Value = resultRanks
+            .Range("A1").Resize(lastRow, TotalCols).ClearContents
+            .Range("A1").Resize(totalRows, TotalCols).Value = resultRanks
         End With
     End If
     Call LoadToMart
 End Sub
 
 Public Sub UpdateRank(updatedRank As String, periodValue As Long, id As Long)
-    If Not RanksDict.Exists(updatedRank) Then 
+    If Not RanksDict.Exists(updatedRank) Then
         RanksDict.Item(RanksKeys(id)) = periodValue
-        RanksDict.Key(RanksKeys(id)) = updatedRank
+        RanksDict.key(RanksKeys(id)) = updatedRank
         RanksKeys(id) = updatedRank
-    Elseif (RanksDict.Item(RanksKeys(id)) <> periodValue) Then
+    ElseIf (RanksDict.Item(RanksKeys(id)) <> periodValue) Then
         RanksDict.Item(RanksKeys(id)) = periodValue
     Else
         Err.Raise vbObjectError + 1101, "UpdateRank", "Наименования разрядов не должны совпадать"
@@ -86,15 +86,15 @@ End Sub
 
 Public Function DeleteRank(id As Long) As Boolean
     If RanksKeys.Exists(id) Then
-        If RanksDict.Exists(RanksKeys.Item(id)) Then 
-            RanksDict.Remove(RanksKeys.Item(id))
-            RanksKeys.Remove(id)
+        If RanksDict.Exists(RanksKeys.Item(id)) Then
+            RanksDict.Remove (RanksKeys.Item(id))
+            RanksKeys.Remove (id)
         Else
             Err.Raise vbObjectError + 1101, "DeleteRank", "Разряд с таким наименованием не найден"
         End If
-    Else 
+    Else
         Err.Raise vbObjectError + 1101, "DeleteRank", "Разряд с таким id не найден"
-    End If 
+    End If
     DeleteRank = True
 End Function
 
@@ -124,12 +124,12 @@ Private Sub LoadPrimaryRanks()
     primaryRanks = [{"бр",0;"IIIю",2;"IIю",2;"Iю",2;"III",2;"II",2;"I",2;"КМС",2;"МС",3;"МСМК",0}]
     rowsCount = UBound(primaryRanks, 1)
 
-    wsRanksData.Range("A1:B" &  rowsCount).Value =primaryRanks
+    wsRanksData.Range("A1:B" & rowsCount).Value = primaryRanks
 End Sub
 
 Private Function getRanks() As Variant
     Dim lastRow As Long, lastCol As Long
-    lastRow = wsRanksData.Cells(wsRanksData.Rows.Count, 1).End(xlUp).Row
+    lastRow = wsRanksData.Cells(wsRanksData.Rows.Count, 1).End(xlUp).row
     lastCol = 2
     getRanks = wsRanksData.Range(wsRanksData.Cells(1, 1), wsRanksData.Cells(lastRow, lastCol)).Value
 End Function

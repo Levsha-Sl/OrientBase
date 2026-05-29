@@ -2,7 +2,7 @@ Attribute VB_Name = "Import"
 Private dictClubs As Object
 
 Sub CSV()
-    On Error Goto ErrorHandler
+    On Error GoTo ErrorHandler
 
         Application.ScreenUpdating = False
         Application.Calculation = xlCalculationManual
@@ -19,7 +19,7 @@ Sub CSV()
             If .Show = True Then
                 strFile = .SelectedItems(1)
             Else
-                Goto CleanExit
+                GoTo CleanExit
                 End If
             End With
 
@@ -29,13 +29,13 @@ Sub CSV()
 
             MsgBox "Загрузка завершена. Клубов: " & dictClubs.Count, vbInformation
 
- CleanExit:
+CleanExit:
             Application.ScreenUpdating = True
             Application.Calculation = xlCalculationAutomatic
             Application.EnableEvents = True
          Exit Sub
 
- ErrorHandler:
+ErrorHandler:
             MsgBox "Ошибка: " & Err.Description, vbCritical
             Resume CleanExit
 End Sub
@@ -73,7 +73,7 @@ Sub ProcessCSVToClubs(filePath As String)
 
         Do Until objStream.EOS
             lineData = objStream.ReadText(-2)
-            If Trim(lineData) = "" Then Goto NextLine
+            If Trim(lineData) = "" Then GoTo NextLine
 
                 cols = Split(lineData, ";")
 
@@ -90,7 +90,7 @@ Sub ProcessCSVToClubs(filePath As String)
                     Set dictWsMain(fClub) = targetWsClub
                     Set dictWsNeeds(fClub) = targetWsNeeds
 
-                    Call ClubsSheet.AddClub(fClub, targetWsClub.Name, targetWsNeeds.Name, dataTime)
+                    Call ClubsSheet.AddClub(fClub, targetWsClub.name, targetWsNeeds.name, dataTime)
                 Else
                     Set targetWsClub = dictWsMain(fClub)
                     Set targetWsNeeds = dictWsNeeds(fClub)
@@ -102,7 +102,7 @@ Sub ProcessCSVToClubs(filePath As String)
                 fStat = cols(11)
 
                 ' Определяем строку для записи (всегда ниже последнего заполненного Разряда)
-                lastRowClub = targetWsClub.Cells(targetWsClub.Rows.Count, "C").End(xlUp).Row + 1
+                lastRowClub = targetWsClub.Cells(targetWsClub.Rows.Count, "C").End(xlUp).row + 1
 
                 ' 3. ВЫЗОВ ПРОЦЕДУР ОБРАБОТКИ
                 ' TODO
@@ -113,7 +113,7 @@ Sub ProcessCSVToClubs(filePath As String)
                     Call ProcessUpdatePerson(targetWsClub, targetWsNeeds, baseRow, fStat, lastRowClub)
                 End If
 
- NextLine:
+NextLine:
                 DoEvents ' Обработка очереди событий для стабильности
             Loop
             objStream.Close
@@ -175,7 +175,7 @@ Private Sub ProcessUpdatePerson(ws As Worksheet, wsN As Worksheet, bRow As Long,
         newStat = True
         needRow = True
         comment = "нужно зачетку"
-    Elseif (RanksSheet.GetRankValue(bStat) > 0 And (bEndStat = "" Or bEndStat < Date)) Then
+    ElseIf (RanksSheet.GetRankValue(bStat) > 0 And (bEndStat = "" Or bEndStat < Date)) Then
         needRow = True
         comment = "нужно зачетку"
     End If
@@ -216,7 +216,7 @@ Private Sub ProcessUpdatePerson(ws As Worksheet, wsN As Worksheet, bRow As Long,
 End Sub
 
 Sub AddComment(wsN As Worksheet, fio As String, bd As String, st As String, txt As String)
-    Dim nr As Long: nr = wsN.Cells(wsN.Rows.Count, 1).End(xlUp).Row + 1
+    Dim nr As Long: nr = wsN.Cells(wsN.Rows.Count, 1).End(xlUp).row + 1
     wsN.Cells(nr, 1) = fio: wsN.Cells(nr, 2) = bd: wsN.Cells(nr, 3) = st: wsN.Cells(nr, 4) = txt
 End Sub
 

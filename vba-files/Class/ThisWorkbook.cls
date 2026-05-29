@@ -1,6 +1,6 @@
 VERSION 1.0 CLASS
 BEGIN
-MultiUse = -1  'True
+  MultiUse = -1  'True
 END
 Attribute VB_Name = "ThisWorkbook"
 Attribute VB_GlobalNameSpace = False
@@ -9,10 +9,10 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 
 Private Sub Workbook_Open()
-    DataSheets.InitApp  
+    DataSheets.InitApp
 End Sub
 
-Private Sub Workbook_SheetSelectionChange(Byval Sh As Object, Byval Target As Range)
+Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal Target As Range)
     If Sh.name = "Клубы" Then
         ' TODO переместить в клубы
         If Target.Column <> 5 Or Target.Count > 1 Then Exit Sub
@@ -36,7 +36,7 @@ Private Sub Workbook_SheetSelectionChange(Byval Sh As Object, Byval Target As Ra
                 End If
 End Sub
 
-Private Sub Workbook_SheetFollowHyperlink(Byval Sh As Object, Byval Target As Hyperlink)
+Private Sub Workbook_SheetFollowHyperlink(ByVal Sh As Object, ByVal Target As Hyperlink)
     If Sh.name = "Клубы" Then
         ' TODO переместить в клубы
         Dim sheetName As String
@@ -49,12 +49,12 @@ Private Sub Workbook_SheetFollowHyperlink(Byval Sh As Object, Byval Target As Hy
         End If
 End Sub
 
-Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
+Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
     Dim hasChangesMart As Boolean: hasChangesMart = True
 
     Select Case Sh.name
      Case "База"
-        hasChangesMart = BaseSheet.ChangesMart(Target) 
+        hasChangesMart = BaseSheet.ChangesMart(Target)
      Case "Разряды"
         hasChangesMart = RanksSheet.ChangesMart(Target)
     End Select

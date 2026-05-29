@@ -12,7 +12,7 @@ Private Function GetClubsSheet() As Worksheet
     If ws Is Nothing Then
         Set ws = ThisWorkbook.Worksheets. _
         Add(Before:=ThisWorkbook.Worksheets(3))
-        ws.Name = "Клубы"
+        ws.name = "Клубы"
 
         ws.Range("A1:E1").Value = Array("Список участников", "Что предоставить", "Полное название клуба", "Время загрузки", "Управление")
         ws.Range("A1:E1").Font.Bold = True
@@ -23,7 +23,7 @@ Private Function GetClubsSheet() As Worksheet
 End Function
 
 Public Sub AddClub(clubFullName As String, wsClubName As String, wsNeedsName As String, dataTime As Date)
-    Dim targetRow As Long: targetRow = wsClubs.Cells(wsClubs.Rows.Count, 3).End(xlUp).Row + 1
+    Dim targetRow As Long: targetRow = wsClubs.Cells(wsClubs.Rows.Count, 3).End(xlUp).row + 1
 
     wsClubs.Cells(targetRow, 3).Value = clubFullName
     wsClubs.Cells(targetRow, 4).Value = Format(dataTime, "dd.mm.yyyy hh:mm:ss")
@@ -38,7 +38,7 @@ End Sub
 
 Public Sub RemoveEmptyLinks()
     Dim i As Long, sheetName As String
-    Dim lastRow As Long: lastRow = wsClubs.Cells(wsClubs.Rows.Count, 3).End(xlUp).Row
+    Dim lastRow As Long: lastRow = wsClubs.Cells(wsClubs.Rows.Count, 3).End(xlUp).row
 
     For i = lastRow To 2 Step -1
         sheetName = ModuleSheet.GetSheetFromLink(wsClubs.Cells(i, 1))
