@@ -2,7 +2,7 @@ Attribute VB_Name = "RanksSheet"
 Public wsRanks As Worksheet
 
 Public Sub Init()
-    Set wsRanks = RanksSheet.GetRanksSheet
+    Set wsRanks = GetRanksSheet
 End Sub
 
 Public Function ChangesMart(Target As Range) As Boolean
@@ -61,7 +61,7 @@ Private Function GetRanksSheet() As Worksheet
         Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName("Разряды")
 
         If ws Is Nothing Then
-            Set ws = ThisWorkbook.Worksheets. Add(Before:=ThisWorkbook.Worksheets(4))
+            Set ws = ThisWorkbook.Worksheets. Add(Before:=ThisWorkbook.Worksheets(1))
 
             With ws
                 .Name = "Разряды"
@@ -83,7 +83,7 @@ Private Function GetRanksSheet() As Worksheet
                 Width:=ws.Cells(1, 5).Width + ws.Cells(1, 6).Width, _
                 Height:=ws.Cells(1, 1).Height)
                 With btnSave
-                    .OnAction = "BtnSave"
+                    .OnAction = "RanksSheet.BtnSave"
                     .Caption = "Сохранить"
                 End With
             End With
@@ -96,7 +96,7 @@ Private Function GetRanksSheet() As Worksheet
         Application.ScreenUpdating = True
      Exit Function
  ErrorHandler:
-        MsgBox "Ошибка при получении листа разрядов: " & Err.Description, vbCritical
+        MsgBox "Ошибка при создании листа разрядов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function
 

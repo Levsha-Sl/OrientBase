@@ -15,21 +15,21 @@ End Sub
 
 Private Sub InitMarts()
     RanksSheet.Init  'wsRanks
-    ' BaseSheet.Init 'wsBase
+    BaseSheet.Init 'wsBase
     ' ClubsSheet.Init  'wsClubs
 End Sub
 
 Private Sub LoadAllDataToMarts()
     Ranks.LoadToMart
-    ' TODO Base.LoadToMarts
+    Base.LoadToMart
     ' TODO Clubs.LoadToMart
 End Sub
 
-Public Function GetSheet(name As String, queueNumber) As Worksheet
+Public Function GetSheet(name As String) As Worksheet
     Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName(name)
     If ws Is Nothing Then
         Set ws = ThisWorkbook.Worksheets. _
-        Add(Before:=ThisWorkbook.Worksheets(queueNumber))
+        Add(Before:=ThisWorkbook.Worksheets(1))
         ws.Name = name
         ws.Visible = xlSheetVeryHidden
     End If

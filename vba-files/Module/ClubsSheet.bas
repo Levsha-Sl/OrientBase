@@ -11,7 +11,7 @@ Private Function GetClubsSheet() As Worksheet
 
     If ws Is Nothing Then
         Set ws = ThisWorkbook.Worksheets. _
-        Add(Before:=ThisWorkbook.Worksheets(6))
+        Add(Before:=ThisWorkbook.Worksheets(3))
         ws.Name = "Клубы"
 
         ws.Range("A1:E1").Value = Array("Список участников", "Что предоставить", "Полное название клуба", "Время загрузки", "Управление")

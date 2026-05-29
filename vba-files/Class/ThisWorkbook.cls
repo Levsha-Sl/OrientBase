@@ -50,43 +50,18 @@ Private Sub Workbook_SheetFollowHyperlink(Byval Sh As Object, Byval Target As Hy
 End Sub
 
 Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
-    If Sh.name = "База" Then
-        ' TODO переместить в базу
-        Dim rowIdx As Long: rowIdx = Target.row
-        Dim colIdx As Long: colIdx = Target.Column
-        ' Проверяем, что изменение в пределах A-H и ниже заголовков
-        If colIdx <= 8 And rowIdx >= 6 Then
+    Dim hasChangesMart As Boolean: hasChangesMart = True
 
-            Dim hasFirstThree As Boolean
-            Dim hasAnyOther As Boolean
+    Select Case Sh.name
+     Case "База"
+        hasChangesMart = BaseSheet.ChangesMart(Target) 
+     Case "Разряды"
+        hasChangesMart = RanksSheet.ChangesMart(Target)
+    End Select
 
-            ' 1. Проверяем первые три (A, B, C) — должны быть все заполнены
-            ' CountA вернет 3, если ячейки A, B и C не пустые
-            hasFirstThree = (Application.WorksheetFunction.CountA(Sh.Range(Sh.Cells(rowIdx, 1), Sh.Cells(rowIdx, 3))) = 3)
-
-            ' 2. Проверяем остальные (D, E, F, G, H) — должна быть хотя бы одна
-            hasAnyOther = (Application.WorksheetFunction.CountA(Sh.Range(Sh.Cells(rowIdx, 4), Sh.Cells(rowIdx, 8))) > 0)
-
-            Application.EnableEvents = False
-
-            ' Если оба условия выполнены — ставим дату
-            If hasFirstThree And hasAnyOther Then
-                Sh.Cells(rowIdx, 9).Value = Now
-            Else
-                ' Если условия перестали соблюдаться (например, стерли ФИО) — очищаем дату
-                Sh.Cells(rowIdx, 9).ClearContents
-            End If
-
-            Application.EnableEvents = True
-        End If
-    End If
-
-    If Sh.name = "Разряды" Then
-        Dim hasChangesMart As Boolean: hasChangesMart = RanksSheet.ChangesMart(Target) 
-        If Not hasChangesMart Then
-            Application.EnableEvents = False
-            Application.Undo
-            Application.EnableEvents = True
-        End If
+    If Not hasChangesMart Then
+        Application.EnableEvents = False
+        Application.Undo
+        Application.EnableEvents = True
     End If
 End Sub

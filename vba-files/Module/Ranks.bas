@@ -12,7 +12,7 @@ End Function
 Public Function Init() As Worksheet
     If wsRanksData Is Nothing Then
         ' (STAT)key PERIODAGE
-        Set wsRanksData = DataSheets.GetSheet("Ranks", 1)
+        Set wsRanksData = DataSheets.GetSheet("Ranks")
         If wsRanksData.Cells(1, 1).Value = "" Then 
             Call LoadPrimaryRanks
         End If
@@ -37,8 +37,8 @@ Public Sub LoadToMart()
         RanksKeys.Add i, ranks(i, 1)
         RanksDict.Add ranks(i, 1), ranks(i, 2)
         martArr(i, 1) = i            ' ID
-        martArr(i, 2) = ranks(i, 1)   ' Rank
-        martArr(i, 3) = ranks(i, 2)   ' PeriodAge
+        martArr(i, 2) = ranks(i, 1)  ' Rank
+        martArr(i, 3) = ranks(i, 2)  ' PeriodAge
     Next i
 
     Application.EnableEvents = False
@@ -130,5 +130,6 @@ End Sub
 Private Function getRanks() As Variant
     Dim lastRow As Long, lastCol As Long
     lastRow = wsRanksData.Cells(wsRanksData.Rows.Count, 1).End(xlUp).Row
-    getRanks = wsRanksData.Range(wsRanksData.Cells(1, 1), wsRanksData.Cells(lastRow, 2)).Value
+    lastCol = 2
+    getRanks = wsRanksData.Range(wsRanksData.Cells(1, 1), wsRanksData.Cells(lastRow, lastCol)).Value
 End Function
