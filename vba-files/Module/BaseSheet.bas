@@ -104,11 +104,11 @@ Public Function ChangesMart(Target As Range) As Boolean
                 End If
             End If
         End If
-CleanExit:
+ CleanExit:
         ChangesMart = Result
         Application.EnableEvents = True
      Exit Function
-ErrorHandler:
+ ErrorHandler:
         Select Case Err.Number
          Case vbObjectError + 1201
             MsgBox Err.Description, vbExclamation, "Ошибка изменения данных"
@@ -164,15 +164,25 @@ Private Function GetBaseSheet() As Worksheet
                     .Caption = "Сохранить"
                 End With
 
+                Dim BtnTest As Object: Set BtnTest = ws.Buttons.Add( _
+                Left:=ws.Cells(3, 5).Left, _
+                Top:=ws.Cells(3, 5).Top, _
+                Width:=ws.Cells(3, 5).Width + ws.Cells(3, 6).Width, _
+                Height:=ws.Cells(3, 1).Height)
+                With BtnTest
+                    .OnAction = "BaseSheet.BtnImportOrgeo"
+                    .Caption = "Импорт c Orgeo"
+                End With
+
             End With
         End If
 
         Set GetBaseSheet = ws
-CleanExit:
+ CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
      Exit Function
-ErrorHandler:
+ ErrorHandler:
         MsgBox "Ошибка при создании листа спортсменнов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function
@@ -182,6 +192,33 @@ Private Sub BtnSave()
         tblBase.DataBodyRange.Delete
     End If
     Call Base.SaveChanges
+End Sub
+
+Private Sub BtnImportOrgeo()
+    Dim clubsData As Object
+    Dim clubsView As Object
+    Dim selected As Collection
+    Dim club As Variant
+
+    Set clubsData = ParseAthletes(ModuleCSV.OpenCSVFile())
+
+    Set clubsView = CreateObject("Scripting.Dictionary")
+    clubsView.CompareMode = 1
+
+    For Each key In clubsData.Keys
+        clubsView.Add key, clubsData.Item(key).Count
+    Next key
+
+    Set selected = ShowClubSelector(clubsView)
+
+    If selected Is Nothing Then
+        MsgBox "Отмена", vbInformation
+     Exit Sub
+    End If
+
+    For Each club In selected
+        MsgBox club, vbInformation
+    Next club
 End Sub
 
 Private Function GetTableBase() As ListObject
@@ -280,86 +317,39 @@ Private Function GetTableBase() As ListObject
     Set GetTableBase = tbl
 End Function
 
+Private Function ParseAthletes(lines As Collection) As Object
+    Dim clubs As Object
 
-' TODO пока не трогать
-Public Sub ExportToCSV()
-    Dim filePath As Variant
-    Dim lastRow As Long, i As Long, j As Long
-    Dim lineData As String, objStream As Object
-
-    filePath = Application.GetSaveAsFilename(InitialFileName:="base.csv", _
-    FileFilter:="CSV Files (*.csv), *.csv")
-    If VarType(filePath) = vbBoolean Then Exit Sub
-
-        Set objStream = CreateObject("ADODB.Stream")
-        objStream.Charset = "utf-8"
-        objStream.Open
-
-        lastRow = wsBase.Cells(wsBase.Rows.Count, "A").End(xlUp).row
-
-        ' Сохраняем с 5 строки (заголовки + данные)
-        For i = 5 To lastRow
-            lineData = ""
-            For j = 1 To 4 ' Столбцы A-D
-                lineData = lineData & wsBase.Cells(i, j).Value & ";"
-            Next j
-            ' Столбцы F-G
-            lineData = lineData & wsBase.Cells(i, 6).Value & ";" & wsBase.Cells(i, 7).Value
-
-            objStream.WriteText lineData, 1 ' 1 = с переносом строки
-        Next i
-
-        objStream.SaveToFile filePath, 2 ' 2 = перезаписать
-        objStream.Close
-        MsgBox "Экспорт завершен", vbInformation
-End Sub
-
-Public Sub ImportCSVToExcel()
-    Dim filePath As Variant
-    Dim objStream As Object
+    Dim athleteDict As Object
     Dim lineData As String
     Dim cols() As String
-    Dim lastRow As Long
+    Dim clubName As String
+    Dim athleteKey As String
+    Dim athleteRank As String
     Dim i As Long
 
-    filePath = Application.GetOpenFilename( _
-    FileFilter:="CSV Files (*.csv), *.csv", _
-    Title:="Выберите CSV файл для импорта (ADODB)")
-    If VarType(filePath) = vbBoolean Then Exit Sub
+    Set clubs = CreateObject("Scripting.Dictionary")
+    clubs.CompareMode = 1
 
-        Set objStream = CreateObject("ADODB.Stream")
-        objStream.Charset = "utf-8"
-        objStream.Open
-        objStream.LoadFromFile filePath
+    For i = 1 To lines.Count
+        lineData = lines(i)
+        cols = Split(lineData, ";")
 
-        Application.ScreenUpdating = False
+        If UBound(cols) >= 11 Then
+            clubName = Trim(cols(1))
+            athleteRank = Trim(cols(11))
+            athleteKey = Trim(cols(3)) & " " & Trim(cols(4)) & " " & Trim(cols(5)) & "#" & Trim(cols(7))
 
-        If Not objStream.EOS Then objStream.ReadText (-2)
-            Do Until objStream.EOS
-                lineData = objStream.ReadText(-2)
+            If Not clubs.Exists(clubName) Then
+                Set athleteDict = CreateObject("Scripting.Dictionary")
+                clubs.Add clubName, athleteDict
+            Else
+                Set athleteDict = clubs(clubName)
+            End If
 
-                ' Проверяем, что строка не пустая
-                If Trim(lineData) <> "" Then
-                    cols = Split(lineData, ";") ' Жестко заданный разделитель
+            athleteDict.Add athleteKey, athleteRank
+        End If
+    Next i
 
-                    ' Находим место для вставки
-                    lastRow = wsBase.Cells(wsBase.Rows.Count, "A").End(xlUp).row + 1
-                    If lastRow < 6 Then lastRow = 6
-
-                        wsBase.Cells(lastRow, 1).Value = Trim(cols(0))
-                        wsBase.Cells(lastRow, 2).Value = Trim(cols(1))
-                        wsBase.Cells(lastRow, 3).Value = Trim(cols(2))
-                        wsBase.Cells(lastRow, 4).Value = Trim(cols(3))
-
-                        wsBase.Cells(lastRow, 6).Value = Trim(cols(4))
-                        wsBase.Cells(lastRow, 7).Value = Trim(cols(5))
-
-                    End If
-                Loop
-                objStream.Close
-
-                wsBase.Columns("A:I").AutoFit
-                Application.ScreenUpdating = True
-
-                MsgBox "Данные успешно добавлены!", vbInformation
-End Sub
+    Set ParseAthletes = clubs
+End Function
