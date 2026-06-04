@@ -1,6 +1,8 @@
 Attribute VB_Name = "RanksSheet"
 Public wsRanks As Worksheet
 
+Public Const SHEET_NAME As String = "Разряды"
+
 Public Sub Init()
     Set wsRanks = GetRanksSheet
 End Sub
@@ -58,13 +60,13 @@ Private Function GetRanksSheet() As Worksheet
         Application.EnableEvents = False
         Application.ScreenUpdating = False
 
-        Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName("Разряды")
+        Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName(SHEET_NAME)
 
         If ws Is Nothing Then
             Set ws = ThisWorkbook.Worksheets.Add(Before:=ThisWorkbook.Worksheets(1))
 
             With ws
-                .name = "Разряды"
+                .name = SHEET_NAME
                 .Range("A1:C1").Value = [{"ID","Разряд","Период (.г)"}]
 
                 With .Range("A1:C1")

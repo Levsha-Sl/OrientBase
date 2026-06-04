@@ -49,13 +49,13 @@ Private Sub Workbook_SheetFollowHyperlink(ByVal Sh As Object, ByVal Target As Hy
         End If
 End Sub
 
-Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
+Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
     Dim hasChangesMart As Boolean: hasChangesMart = True
 
     Select Case Sh.name
-     Case "База"
+     Case BaseSheet.SHEET_NAME
         hasChangesMart = BaseSheet.ChangesMart(Target)
-     Case "Разряды"
+     Case RanksSheet.SHEET_NAME
         hasChangesMart = RanksSheet.ChangesMart(Target)
     End Select
 

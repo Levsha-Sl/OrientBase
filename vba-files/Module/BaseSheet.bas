@@ -2,6 +2,7 @@ Attribute VB_Name = "BaseSheet"
 Public wsBase As Worksheet
 Private tblBase As ListObject
 
+Public Const SHEET_NAME As String = "База"
 Private Const COL_RANK As String = "Разряд"
 Private Const COL_RANK_DATE As String = "дата_раз."
 Private Const COL_RANK_EXPIRY As String = "окончание"
@@ -14,7 +15,7 @@ Public Sub Init()
     Set wsBase = GetBaseSheet
 End Sub
 
-Public Function CalculateRankExpiry(ByVal rankDate As Variant, ByVal targetRank As String) As Variant
+Public Function CalculateRankExpiry(Byval rankDate As Variant, Byval targetRank As String) As Variant
     If IsEmpty(rankDate) Or rankDate = "" Or targetRank = "" Then
         CalculateRankExpiry = ""
      Exit Function
@@ -33,7 +34,7 @@ Public Function CalculateRankExpiry(ByVal rankDate As Variant, ByVal targetRank 
         Err.Clear
      Exit Function
     End If
-    On Error GoTo 0
+    On Error Goto 0
 
         If addedYears <= 0 Then
             CalculateRankExpiry = ""
@@ -43,7 +44,7 @@ Public Function CalculateRankExpiry(ByVal rankDate As Variant, ByVal targetRank 
         CalculateRankExpiry = DateAdd("yyyy", addedYears, CDate(rankDate)) - 1
 End Function
 
-Public Function CalculateInsuranceExpiry(ByVal insDate As Variant, ByVal period As Variant) As Variant
+Public Function CalculateInsuranceExpiry(Byval insDate As Variant, Byval period As Variant) As Variant
     If IsEmpty(insDate) Or insDate = "" Or IsEmpty(period) Or period = "" Then
         CalculateInsuranceExpiry = ""
      Exit Function
@@ -63,7 +64,7 @@ Public Function CalculateInsuranceExpiry(ByVal insDate As Variant, ByVal period 
 End Function
 
 Public Function ChangesMart(Target As Range) As Boolean
-    On Error GoTo ErrorHandler
+    On Error Goto ErrorHandler
         Dim Result As Boolean: Result = True
         Dim rowIdx As Long: rowIdx = Target.row
         Dim colIdx As Long: colIdx = Target.Column
@@ -133,21 +134,18 @@ Public Sub AcceptBaseData(martArr As Variant)
 End Sub
 
 Private Function GetBaseSheet() As Worksheet
-    On Error GoTo ErrorHandler
+    On Error Goto ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
-        Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName("База")
+        Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName(BaseSheet.SHEET_NAME)
 
         If ws Is Nothing Then
             Set ws = ThisWorkbook.Worksheets.Add(Before:=ThisWorkbook.Worksheets(2))
 
             With ws
-                .name = "База"
+                .name = BaseSheet.SHEET_NAME
                 .Range("A5:J5").Value = Array("id", "ФИО", "День рож.", COL_RANK, COL_RANK_DATE, COL_RANK_EXPIRY, COL_INS_DATE, COL_PERIOD, COL_INS_EXPIRY, COL_TIME_STEMP)
-
-                With .Range("A5:J5")
-                    .Font.Bold = True
-                End With
+                .Range("A5:J5").Font.Bold = True
 
                 With .Columns("A:J")
                     .AutoFit
