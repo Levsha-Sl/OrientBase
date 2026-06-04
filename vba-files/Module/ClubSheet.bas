@@ -10,6 +10,10 @@ Private Const COL_INS_DATE As String = "дата_страх."
 Private Const COL_PERIOD As String = "период"
 Private Const COL_INS_EXPIRY As String = "окончaние"
 
+Private Property Get arrStatus() As Variant
+arrStatus = Array("Инф.базы", "Обнов", "Новый")
+End Property
+
 Public Function GetClubSheet(clubIndex As Long, club As ClubModule) As Worksheet
     On Error Goto ErrorHandler
         Application.EnableEvents = False
@@ -30,7 +34,7 @@ Public Function GetClubSheet(clubIndex As Long, club As ClubModule) As Worksheet
             headerData(3, 1) = "Количество участников: 0"
             .Range("A1:A3").Value = headerData
 
-            .Range("A4:J4").Value = Array(COL_STATUS,"id", "ФИО", "День рож.", COL_RANK, COL_RANK_DATE, COL_RANK_EXPIRY, COL_INS_DATE, COL_PERIOD, COL_INS_EXPIRY)
+            .Range("A4:J4").Value = Array("ФИО", COL_STATUS, "id", "День рож.", COL_RANK, COL_RANK_DATE, COL_RANK_EXPIRY, COL_INS_DATE, COL_PERIOD, COL_INS_EXPIRY)
             .Range("A4:J4").Font.Bold = True
 
             Dim btn As Object: Set btn = .Buttons.Add( _
@@ -59,7 +63,3 @@ Public Function GetClubSheet(clubIndex As Long, club As ClubModule) As Worksheet
         MsgBox "Ошибка при создании листа клуба(" & clubName & "): " & Err.Description, vbCritical
         Resume CleanExit
 End Function
-
-Private Property Get arrStatus() As Variant
-    arrStatus = Array("Инф.базы", "Обнов", "Новый")
-End Property
