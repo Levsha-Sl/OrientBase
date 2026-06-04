@@ -3,7 +3,6 @@ Private wsCl As Worksheet
 Private tblCl As ListObject
 
 Private Const COL_STATUS As String = "Статус"
-Private Const ARR_STATUS As Array = Array("Инф.базы","Обнов","Новый")
 Private Const COL_RANK As String = "Разряд"
 Private Const COL_RANK_DATE As String = "дата_раз."
 Private Const COL_RANK_EXPIRY As String = "окончание"
@@ -60,3 +59,7 @@ Public Function GetClubSheet(clubIndex As Long, club As ClubModule) As Worksheet
         MsgBox "Ошибка при создании листа клуба(" & clubName & "): " & Err.Description, vbCritical
         Resume CleanExit
 End Function
+
+Private Property Get arrStatus() As Variant
+    arrStatus = Array("Инф.базы", "Обнов", "Новый")
+End Property
