@@ -196,27 +196,35 @@ Private Sub BtnImportOrgeo()
     Dim clubsData As Object
     Dim clubsView As Object
     Dim selected As Collection
-    Dim club As Variant
 
     Set clubsData = ParseAthletes(ModuleCSV.OpenCSVFile())
-
-    Set clubsView = CreateObject("Scripting.Dictionary")
-    clubsView.CompareMode = 1
+    Set clubsView = CreateObject("Scripting.Dictionary"): clubsView.CompareMode = 1
 
     For Each key In clubsData.Keys
         clubsView.Add key, clubsData.Item(key).Count
     Next key
 
     Set selected = ShowClubSelector(clubsView)
-
     If selected Is Nothing Then
         MsgBox "Отмена", vbInformation
      Exit Sub
     End If
 
-    For Each club In selected
-        MsgBox club, vbInformation
-    Next club
+    Dim newClubsData As Object
+    Set newClubsData = CreateObject("Scripting.Dictionary"): newClubsData.CompareMode = 1
+
+    Dim club As ClubModule
+    Dim clubInSelected As Variant
+    Dim time As Date: time = Now
+    Dim i As Long: i = 0
+    For Each clubInSelected In selected
+        Set club = New ClubModule
+        club.Init clubInSelected, time, clubsData.Item(clubInSelected)
+        i = i + 1
+        newClubsData.Add i, club
+    Next clubInSelected
+
+    ClubsList.Init newClubsData
 End Sub
 
 Private Function GetTableBase() As ListObject

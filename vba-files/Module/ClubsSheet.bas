@@ -1,51 +1,134 @@
 Attribute VB_Name = "ClubsSheet"
 Public wsClubs As Worksheet
-Public Sub InitClubsSheet()
-    If wsClubs Is Nothing Then
-        Set wsClubs = ClubsSheet.GetClubsSheet
-    End If
+
+Public Const SHEET_NAME As String = "Клубы"
+Private Const DELETED As String = "Удалить"
+
+Public Sub Init()
+    Set wsClubs = ClubsSheet.GetClubsSheet
 End Sub
 
 Private Function GetClubsSheet() As Worksheet
-    Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName("Клубы")
+    On Error Goto ErrorHandler
+        Application.EnableEvents = False
+        Application.ScreenUpdating = False
 
-    If ws Is Nothing Then
-        Set ws = ThisWorkbook.Worksheets. _
-        Add(Before:=ThisWorkbook.Worksheets(3))
-        ws.name = "Клубы"
+        Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName(SHEET_NAME)
+        If ws Is Nothing Then
+            Set ws = ThisWorkbook.Worksheets. _
+            Add(Before:=ThisWorkbook.Worksheets(3))
+            With ws
+                .name = SHEET_NAME
+                .Range("A1:D1").Value = Array("Список участников","id","Название клуба", "Время загрузки")
+                .Range("A1:D1").Font.Bold = True
 
-        ws.Range("A1:E1").Value = Array("Список участников", "Что предоставить", "Полное название клуба", "Время загрузки", "Управление")
-        ws.Range("A1:E1").Font.Bold = True
+                .Columns("A:D").AutoFit
+            End With
+        Else
+            Dim lastRow As Long: lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).row
+            If lastRow > 1 Then
+                ws.Range("A2:D" & lastRow).ClearContents
+            End If
+        End If
 
-        ws.Columns("A:E").AutoFit
-    End If
-    Set GetClubsSheet = ws
+        Application.DisplayAlerts = False
+
+        Dim sh As Worksheet
+        For Each sh In ThisWorkbook.Worksheets
+            If sh.Visible = xlSheetVisible And sh.Name <> SHEET_NAME And sh.Name <> BaseSheet.SHEET_NAME And sh.Name <> RanksSheet.SHEET_NAME Then
+                sh.Delete
+            End If
+        Next sh
+
+        Set GetClubsSheet = ws
+ CleanExit:
+        Application.EnableEvents = True
+        Application.ScreenUpdating = True
+        Application.DisplayAlerts = True
+     Exit Function
+ ErrorHandler:
+        MsgBox "Ошибка при создании листа клубов: " & Err.Description, vbCritical
+        Resume CleanExit
 End Function
 
-Public Sub AddClub(clubFullName As String, wsClubName As String, wsNeedsName As String, dataTime As Date)
-    Dim targetRow As Long: targetRow = wsClubs.Cells(wsClubs.Rows.Count, 3).End(xlUp).row + 1
+Public Sub AcceptClubs(clubsData As Object)
+    On Error Goto ErrorHandler
+        Application.EnableEvents = False
+        Application.ScreenUpdating = False
 
-    wsClubs.Cells(targetRow, 3).Value = clubFullName
-    wsClubs.Cells(targetRow, 4).Value = Format(dataTime, "dd.mm.yyyy hh:mm:ss")
-    wsClubs.Hyperlinks.Add Anchor:=wsClubs.Cells(targetRow, 1), Address:="", _
-    SubAddress:="'" & wsClubName & "'!A1", TextToDisplay:="Перейти к списку"
-    wsClubs.Hyperlinks.Add Anchor:=wsClubs.Cells(targetRow, 2), Address:="", _
-    SubAddress:="'" & wsNeedsName & "'!A1", TextToDisplay:="Открыть документы"
-    wsClubs.Cells(targetRow, 5).Value = "УДАЛИТЬ КЛУБ"
-    wsClubs.Cells(targetRow, 5).Font.Color = vbRed
-    wsClubs.Columns("A:D").AutoFit
+        Dim clubKey As Variant
+        Dim clubId As Long
+        Dim club As ClubModule
+        Dim clSheet As Worksheet
+
+        Dim dataArr()
+        Dim sheetNames()
+
+        ReDim dataArr(1 To clubsData.Count, 1 To 4)
+        ReDim sheetNames(1 To clubsData.Count)
+
+        For Each clubKey In clubsData.Keys
+            clubId = CLng(clubKey)
+            Set club = clubsData.Item(clubId)
+            Set clSheet = ClubSheet.GetClubSheet(clubId, club)
+            sheetNames(clubId) = clSheet.name
+
+            dataArr(clubId, 1) = clubId
+            dataArr(clubId, 2) = club.ClubName
+            dataArr(clubId, 3) = club.TimeStamp
+            dataArr(clubId, 4) = DELETED
+        Next clubKey
+
+        With wsClubs
+            .Range("B2").Resize(UBound(dataArr, 1), 4).Value = dataArr
+
+            Dim i As Long
+            For i = 1 To UBound(sheetNames)
+                .Hyperlinks.Add Anchor:=.Cells(i + 1, 1), Address:="", _ 
+                SubAddress:="'" & sheetNames(i) & "'!A1", _
+                TextToDisplay:="Перейти к списку"
+            Next i
+
+            .Columns(4).NumberFormat = "dd.mm.yyyy hh:mm:ss"
+            .Columns(5).Font.Color = vbRed
+            .Columns("A:E").AutoFit
+            .Activate
+        End With
+ CleanExit:
+        Application.EnableEvents = True
+        Application.ScreenUpdating = True
+     Exit Sub
+ ErrorHandler:
+        MsgBox "Ошибка при записи клубов в листы: " & Err.Description, vbCritical
+        Resume CleanExit
 End Sub
 
-Public Sub RemoveEmptyLinks()
-    Dim i As Long, sheetName As String
-    Dim lastRow As Long: lastRow = wsClubs.Cells(wsClubs.Rows.Count, 3).End(xlUp).row
+Public Sub HandleSelectionChange(Target As Range)
+    If Target.Column = 5 _
+        And Target.Count = 1 _
+        And Target.Row > 1 _
+        And Target.Value = DELETED Then
 
-    For i = lastRow To 2 Step -1
-        sheetName = ModuleSheet.GetSheetFromLink(wsClubs.Cells(i, 1))
+        Dim mainRef As String: mainRef = ModuleSheet.GetSheetFromLink(wsClubs.Cells(Target.row, 1))
 
-        If sheetName = "" Or Not ModuleSheet.SheetExists(sheetName) Then
-            wsClubs.Rows(i).Delete
+        If MsgBox("Удалить лист клуба?", vbYesNo + vbQuestion) = vbYes Then
+
+            Application.DisplayAlerts = False
+
+            ModuleSheet.DeleteSheetIfExists mainRef
+            Target.EntireRow.Delete
+
+            Application.DisplayAlerts = True
         End If
-    Next i
+    End If
 End Sub
 
+Public Sub HandleFollowHyperlink(Target As Hyperlink)
+    Dim sheetName As String: sheetName = Split(Target.SubAddress, "!")(0)
+    sheetName = Replace(sheetName, "'", "")
+
+    If Not ModuleSheet.SheetExists(sheetName) Then
+        MsgBox "Лист [" & sheetName & "] не найден. Лист клуба удален.", vbExclamation
+        Target.Range.EntireRow.Delete
+    End If
+End Sub

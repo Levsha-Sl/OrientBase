@@ -1,106 +1,62 @@
 Attribute VB_Name = "ClubSheet"
-Private ws As Worksheet
+Private wsCl As Worksheet
+Private tblCl As ListObject
 
-Public Function GetClubSheet(clubIndex As Long, mode As String, dataTime As Date, clubFullName As String) As Worksheet
-    Set ws = ThisWorkbook.Worksheets.Add _
+Private Const COL_STATUS As String = "Статус"
+Private Const ARR_STATUS As Array = Array("Инф.базы","Обнов","Новый")
+Private Const COL_RANK As String = "Разряд"
+Private Const COL_RANK_DATE As String = "дата_раз."
+Private Const COL_RANK_EXPIRY As String = "окончание"
+Private Const COL_INS_DATE As String = "дата_страх."
+Private Const COL_PERIOD As String = "период"
+Private Const COL_INS_EXPIRY As String = "окончaние"
+
+Public Function GetClubSheet(clubIndex As Long, club As ClubModule) As Worksheet
+    On Error Goto ErrorHandler
+        Application.EnableEvents = False
+        Application.ScreenUpdating = False
+        Set wsCl = ThisWorkbook.Worksheets.Add _
     (After:=ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count))
     ' Имя листа: L1_2204_1530 (Коротко и уникально)
 
-    ws.name = IIf(mode = "List", "L", "N") & clubIndex & "_" & Format(dataTime, "ddmm_hhmmss")
+        Dim dataTime As Date: dataTime = club.TimeStamp
+        Dim clubName As String: clubName = club.ClubName
 
-    ' ШАПКА ЛИСТА
-    ws.Range("A1").Value = "Клуб: " & clubFullName
-    ws.Range("A2").Value = "Загружено: " & Format(dataTime, "dd.mm.yyyy hh:mm:ss")
-    ws.Range("A3").Value = "Количество участников: 0"
+        With wsCl
+            .name = "L" & clubIndex & "_" & Format(dataTime, "ddmm_hhmmss")
 
-    If mode = "List" Then
-        ws.Range("A4:H4").Value = Array("ФИО", "День рож.", "Разряд", "дата раз.", "окончание", "дата страх.", "период", "окончание")
+            Dim headerData(1 To 3, 1 To 1) As Variant
+            headerData(1, 1) = "Клуб: " & clubName
+            headerData(2, 1) = "Загружено: " & Format(dataTime, "dd.mm.yyyy hh:mm:ss")
+            headerData(3, 1) = "Количество участников: 0"
+            .Range("A1:A3").Value = headerData
 
-        Dim btn As Object: Set btn = ws.Buttons.Add( _
-        Left:=ws.Cells(1, 5).Left, _
-        Top:=ws.Cells(1, 5).Top, _
-        Width:=ws.Cells(1, 5).Width + ws.Cells(1, 6).Width, _
+            .Range("A4:J4").Value = Array(COL_STATUS,"id", "ФИО", "День рож.", COL_RANK, COL_RANK_DATE, COL_RANK_EXPIRY, COL_INS_DATE, COL_PERIOD, COL_INS_EXPIRY)
+            .Range("A4:J4").Font.Bold = True
+
+            Dim btn As Object: Set btn = .Buttons.Add( _
+            Left:=.Cells(1, 5).Left, _
+            Top:=.Cells(1, 5).Top, _
+            Width:=.Cells(1, 5).Width + .Cells(1, 6).Width, _
         Height:=30)
 
         With btn
-            .OnAction = "LoadCurrentListToBase"
+            '    .OnAction = ""
             .Caption = "Выгрузить в базу"
         End With
 
-        ws.Range("A4:I4").Font.Bold = True
-    Else
-        ws.Range("A4:D4").Value = Array("ФИО", "День рож.", "Разряд", "Комментарий")
-        ws.Range("A4:D4").Font.Bold = True
-    End If
+            .Hyperlinks.Add Anchor:=.Range("B1"), Address:="", SubAddress:=ClubsSheet.SHEET_NAME &"!A" & clubIndex + 1, TextToDisplay:="<< К КЛУБАМ"
+            .Columns("A:H").AutoFit
+        End With
 
-    ' Навигация и закрепление
-    ws.Hyperlinks.Add Anchor:=ws.Range("B1"), Address:="", SubAddress:="Клубы!A1", TextToDisplay:="<< К КЛУБАМ"
-    ws.Activate
-    ActiveWindow.FreezePanes = False
-    ws.Range("A5").Select
-    ActiveWindow.FreezePanes = True
-
-    Set GetClubSheet = ws
-End Function
-
-Sub LoadCurrentListToBase()
-    Set ws = ActiveSheet
-
-    Application.ScreenUpdating = False
-
-    Dim lastRow As Long: lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).row
-
-    Dim i As Long
-    For i = 5 To lastRow
-        If NeedToUpdate(i) Then
-            Dim fio As String, bd As Date
-            ' ФИО и дата рождения всегда в первой строке
-            fio = Trim(ws.Cells(i, 1).Value)
-            bd = ws.Cells(i, 2).Value
-            ' Остальне новые данные могут быть только во второй строке, так как
-            ' Вперовую строку данные будут подтянуты из базы
-            If fio <> "" Then
-                i = i + 1 ' Переходим на вторую строку, где могут быть новые данные
-                Dim personRow As Long: personRow = BaseSheet.PersonExists(fio, bd)
-                If personRow = 0 Then
-                    Dim baseLastRow As Long: baseLastRow = wsBase.Cells(wsBase.Rows.Count, 1).End(xlUp).row + 1
-
-                    wsBase.Cells(baseLastRow, 1).Value = fio
-                    wsBase.Cells(baseLastRow, 2).Value = bd
-
-                    ' Загрузаем остальные данные и форматируем строку
-                    Call UpdatePersonData(i, baseLastRow)
-                Else
-                    ' Если человек уже есть - обновляем только данные
-                    Call UpdatePersonData(i, personRow)
-                End If
-            End If
-        End If
-    Next i
-
-    wsBase.Columns("A:I").AutoFit
+        ' TODO загрузка данных
+        
+        Set GetClubSheet = wsCl
+ CleanExit:
+        Application.EnableEvents = True
     Application.ScreenUpdating = True
-
-    MsgBox "Данные с листа загружены в базу", vbInformation
-End Sub
-
-Private Function NeedToUpdate(row As Long) As Boolean
-    NeedToUpdate = ws.Cells(row + 1, 1).Value = "" And _
-    ws.Cells(row + 1, 2).Value = "" And _
-    ws.Cells(row + 1, 3).Value <> ""
-End Function
-
-Private Function UpdatePersonData(i As Long, personRow As Long)
-    ' Обновляем данные по разряду и страховке, но только если формула вернула дату
-    If IsDate(ws.Cells(i, 5).Value) Or (RanksSheet.GetRankValue(ws.Cells(i, 3).Value) = 0) Then
-        wsBase.Cells(personRow, 3).Value = ws.Cells(i, 3).Value
-        wsBase.Cells(personRow, 4).Value = ws.Cells(i, 4).Value
-    End If
-    If IsDate(ws.Cells(i, 8).Value) Then
-        wsBase.Cells(personRow, 6).Value = ws.Cells(i, 6).Value
-        wsBase.Cells(personRow, 7).Value = ws.Cells(i, 7).Value
-    End If
-
-    wsBase.Cells(personRow, 9).Value = Now
-    Call BaseSheet.ApplyLogicAndFormatting(personRow)
+     Exit Function
+ ErrorHandler:
+        MsgBox "Ошибка при создании листа клуба(" & clubName & "): " & Err.Description, vbCritical
+        Resume CleanExit
 End Function

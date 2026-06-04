@@ -1,6 +1,6 @@
 VERSION 1.0 CLASS
 BEGIN
-  MultiUse = -1  'True
+MultiUse = -1  'True
 END
 Attribute VB_Name = "ThisWorkbook"
 Attribute VB_GlobalNameSpace = False
@@ -12,41 +12,18 @@ Private Sub Workbook_Open()
     DataSheets.InitApp
 End Sub
 
-Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal Target As Range)
-    If Sh.name = " лубы" Then
-        ' TODO переместить в клубы
-        If Target.Column <> 5 Or Target.Count > 1 Then Exit Sub
-            If Target.Value <> "”ƒјЋ»“№  Ћ”Ѕ" Or Target.row = 1 Then Exit Sub
-
-                Dim mainRef As String, needRef As String
-
-                mainRef = ModuleSheet.GetSheetFromLink(Sh.Cells(Target.row, 1))
-                needRef = ModuleSheet.GetSheetFromLink(Sh.Cells(Target.row, 2))
-
-                If MsgBox("”далить листы этой загрузки?", vbYesNo + vbQuestion) <> vbYes Then Exit Sub
-
-                    Application.DisplayAlerts = False
-
-                    ModuleSheet.DeleteSheetIfExists mainRef
-                    ModuleSheet.DeleteSheetIfExists needRef
-
-                    Target.EntireRow.Delete
-
-                    Application.DisplayAlerts = True
-                End If
+Private Sub Workbook_SheetSelectionChange(Byval Sh As Object, Byval Target As Range)
+    Select Case Sh.name
+     Case ClubsSheet.SHEET_NAME
+        Call ClubsSheet.HandleSelectionChange(Target)
+    End Select          
 End Sub
 
-Private Sub Workbook_SheetFollowHyperlink(ByVal Sh As Object, ByVal Target As Hyperlink)
-    If Sh.name = " лубы" Then
-        ' TODO переместить в клубы
-        Dim sheetName As String
-        sheetName = Split(Target.SubAddress, "!")(0)
-        sheetName = Replace(sheetName, "'", "")
-
-        If Not ModuleSheet.SheetExists(sheetName) Then
-            MsgBox "Ћист [" & sheetName & "] не найден. —сылка удалена.", vbExclamation
-            Target.Range.ClearContents
-        End If
+Private Sub Workbook_SheetFollowHyperlink(Byval Sh As Object, Byval Target As Hyperlink)
+    Select Case Sh.name
+     Case ClubsSheet.SHEET_NAME
+        ClubsSheet.HandleFollowHyperlink Target
+    End Select 
 End Sub
 
 Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
@@ -64,4 +41,20 @@ Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
         Application.Undo
         Application.EnableEvents = True
     End If
+End Sub
+
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Application.DisplayAlerts = False
+    
+    Dim sh As Worksheet
+    For Each sh In ThisWorkbook.Worksheets
+    
+        If sh.Visible = xlSheetVisible _
+        And sh.Name <> BaseSheet.SHEET_NAME _
+        And sh.Name <> RanksSheet.SHEET_NAME Then
+            sh.Delete
+        End If
+    Next sh
+
+    Application.DisplayAlerts = True
 End Sub

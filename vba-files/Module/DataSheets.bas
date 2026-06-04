@@ -8,9 +8,9 @@ Public Sub InitApp()
 End Sub
 
 Private Sub InitData()
-    ranks.Init  'wsRanksData
+    Ranks.Init  'wsRanksData
     Base.Init   'wsBaseData
-    clubs.Init  'wsClubsData
+    ' Clubs.Init  'wsClubsData
 End Sub
 
 Private Sub InitMarts()
@@ -20,9 +20,9 @@ Private Sub InitMarts()
 End Sub
 
 Private Sub LoadAllDataToMarts()
-    ranks.LoadToMart
+    Ranks.LoadToMart
     Base.LoadToMart
-    ' TODO Clubs.LoadToMart
+    ' Clubs.LoadToMart
 End Sub
 
 Public Function GetSheet(name As String) As Worksheet
