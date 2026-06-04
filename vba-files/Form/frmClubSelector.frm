@@ -13,6 +13,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
+
 Option Explicit
 
 Private pResult As Collection
@@ -52,7 +54,7 @@ Public Sub Init(ByVal clubs As Object)
             .Top = topPos
             .Width = fraList.Width - 25
             .Height = 18
-            .Value = True
+            .value = True
         End With
 
         topPos = topPos + 20
@@ -69,7 +71,7 @@ Private Sub cmdSelectAll_Click()
 
     For Each ctrl In fraList.Controls
         If TypeName(ctrl) = "CheckBox" Then
-            ctrl.Value = True
+            ctrl.value = True
         End If
     Next ctrl
 
@@ -81,7 +83,7 @@ Private Sub cmdUnselectAll_Click()
 
     For Each ctrl In fraList.Controls
         If TypeName(ctrl) = "CheckBox" Then
-            ctrl.Value = False
+            ctrl.value = False
         End If
     Next ctrl
 
@@ -99,7 +101,7 @@ Private Sub cmdLoad_Click()
 
         If TypeName(ctrl) = "CheckBox" Then
 
-            If ctrl.Value = True Then
+            If ctrl.value = True Then
 
                 txt = ctrl.Caption
 

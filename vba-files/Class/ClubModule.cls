@@ -1,10 +1,10 @@
 VERSION 1.0 CLASS
 BEGIN
-MultiUse = -1  'True
+  MultiUse = -1  'True
 END
 Attribute VB_Name = "ClubModule"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 
@@ -13,18 +13,18 @@ Private pClubName As String
 Private pTimeStamp As Date
 Private pParticipants As Object
 
-Public Sub Init(Byval clubName As String, Byval dataTime As Date, Byval athleteData As Object)
+Public Sub Init(ByVal clubName As String, ByVal dataTime As Date, ByVal athleteData As Object)
     pClubName = clubName
     pTimeStamp = dataTime
     Set pParticipants = athleteData
 End Sub
 
-Public Property Get ClubName() As String
-ClubName = pClubName
+Public Property Get clubName() As String
+clubName = pClubName
 End Property
 
-Public Property Get TimeStamp() As Date
-TimeStamp = pTimeStamp
+Public Property Get timeStamp() As Date
+timeStamp = pTimeStamp
 End Property
 
 Public Property Get ParticipantCount() As Long

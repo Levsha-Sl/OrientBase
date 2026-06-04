@@ -166,9 +166,9 @@ Private Sub ProcessUpdatePerson(ws As Worksheet, wsN As Worksheet, bRow As Long,
     Dim needRow As Boolean: needRow = False
     Dim comment As String: comment = ""
 
-    bStat = wsBase.Cells(bRow, 3).Value
-    bEndStat = wsBase.Cells(bRow, 5).Value
-    bEndIns = wsBase.Cells(bRow, 8).Value
+    bStat = wsBase.Cells(bRow, 3).value
+    bEndStat = wsBase.Cells(bRow, 5).value
+    bEndIns = wsBase.Cells(bRow, 8).value
 
     ' Анализ расхождений
     If bStat <> fStat Then
@@ -197,21 +197,21 @@ Private Sub ProcessUpdatePerson(ws As Worksheet, wsN As Worksheet, bRow As Long,
         ws.Range(ws.Cells(nextR, 3), ws.Cells(nextR, 8)).Interior.Color = RGB(221, 160, 221)
 
         If newStat Then
-            ws.Cells(nextR, 3).Value = fStat
-            ws.Cells(nextR, 4).Value = ""
+            ws.Cells(nextR, 3).value = fStat
+            ws.Cells(nextR, 4).value = ""
             ' Перекрашиваем разряд в голубой
             ws.Cells(nextR, 3).Interior.Color = RGB(173, 216, 230)
         End If
         If newIns Then
-            ws.Cells(nextR, 6).Value = ""
-            ws.Cells(nextR, 7).Value = ""
+            ws.Cells(nextR, 6).value = ""
+            ws.Cells(nextR, 7).value = ""
         End If
 
         ' В этой строке ФИО и ДР пустые по ТЗ
         Call ApplyLogicAndFormatting(ws, nextR)
     End If
 
-    Call AddComment(wsN, ws.Cells(r, 1).Value, ws.Cells(r, 2).Value, fStat, comment)
+    Call AddComment(wsN, ws.Cells(r, 1).value, ws.Cells(r, 2).value, fStat, comment)
     Call ApplyLogicAndFormatting(ws, r)
 End Sub
 
@@ -224,7 +224,7 @@ End Sub
 Sub UpdateCounterAndFormat(ws As Worksheet)
     Dim countVal As Long: countVal = Application.WorksheetFunction.CountA(ws.Range("A5:A200"))
 
-    ws.Range("A3").Value = "Количество участников: " & countVal
+    ws.Range("A3").value = "Количество участников: " & countVal
     ws.Columns("A:I").AutoFit
 End Sub
 

@@ -8,7 +8,7 @@ Public Sub Init()
 End Sub
 
 Public Function ChangesMart(Target As Range) As Boolean
-    On Error GoTo ErrorHandler
+    On Error Goto ErrorHandler
         Dim Result As Boolean: Result = True
         Dim rowIdx As Long: rowIdx = Target.row
         Dim colIdx As Long: colIdx = Target.Column
@@ -19,9 +19,9 @@ Public Function ChangesMart(Target As Range) As Boolean
             Dim rankId As Long, rankName As String, periodValue As Long
             Dim hasId As Boolean, hasData As Boolean
 
-            rankId = wsRanks.Cells(rowIdx, 1).Value
-            rankName = wsRanks.Cells(rowIdx, 2).Value
-            periodValue = IIf(IsEmpty(wsRanks.Cells(rowIdx, 3).Value) Or wsRanks.Cells(rowIdx, 3).Value = "", -1, CLng(wsRanks.Cells(rowIdx, 3).Value))
+            rankId = wsRanks.Cells(rowIdx, 1).value
+            rankName = wsRanks.Cells(rowIdx, 2).value
+            periodValue = IIf(IsEmpty(wsRanks.Cells(rowIdx, 3).value) Or wsRanks.Cells(rowIdx, 3).value = "", -1, CLng(wsRanks.Cells(rowIdx, 3).value))
 
             hasId = (rankId > 0)
             hasData = (rankName <> "") And (periodValue >= 0)
@@ -29,22 +29,22 @@ Public Function ChangesMart(Target As Range) As Boolean
             If Not hasId Then
                 ' ID пуст: INSERT если есть все данные
                 If hasData Then
-                    wsRanks.Cells(rowIdx, 1).Value = ranks.CreateRank(rankName, periodValue)
+                    wsRanks.Cells(rowIdx, 1).value = ranks.CreateRank(rankName, periodValue)
                 End If
             Else
                 ' ID не пуст: UPDATE если данные есть, DELETE если нет
                 If hasData Then
                     Call ranks.UpdateRank(rankName, periodValue, rankId)
                 Else
-                    wsRanks.Cells(rowIdx, 1).Value = IIf(ranks.DeleteRank(rankId), "", rankId)
+                    wsRanks.Cells(rowIdx, 1).value = IIf(ranks.DeleteRank(rankId), "", rankId)
                 End If
             End If
         End If
-CleanExit:
+ CleanExit:
         ChangesMart = Result
         Application.EnableEvents = True
      Exit Function
-ErrorHandler:
+ ErrorHandler:
         Select Case Err.Number
          Case vbObjectError + 1101
             MsgBox Err.Description, vbExclamation, "Ошибка изменения данных"
@@ -56,7 +56,7 @@ ErrorHandler:
 End Function
 
 Private Function GetRanksSheet() As Worksheet
-    On Error GoTo ErrorHandler
+    On Error Goto ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
 
@@ -67,7 +67,7 @@ Private Function GetRanksSheet() As Worksheet
 
             With ws
                 .name = SHEET_NAME
-                .Range("A1:C1").Value = [{"ID","Разряд","Период (.г)"}]
+                .Range("A1:C1").value = [{"ID","Разряд","Период (.г)"}]
 
                 With .Range("A1:C1")
                     .Font.Bold = True
@@ -93,11 +93,11 @@ Private Function GetRanksSheet() As Worksheet
 
         Set GetRanksSheet = ws
 
-CleanExit:
+ CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
      Exit Function
-ErrorHandler:
+ ErrorHandler:
         MsgBox "Ошибка при создании листа разрядов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function

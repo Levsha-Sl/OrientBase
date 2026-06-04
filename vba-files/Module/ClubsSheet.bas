@@ -9,7 +9,7 @@ Public Sub Init()
 End Sub
 
 Private Function GetClubsSheet() As Worksheet
-    On Error Goto ErrorHandler
+    On Error GoTo ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
 
@@ -19,7 +19,7 @@ Private Function GetClubsSheet() As Worksheet
             Add(Before:=ThisWorkbook.Worksheets(3))
             With ws
                 .name = SHEET_NAME
-                .Range("A1:D1").Value = Array("Список участников","id","Название клуба", "Время загрузки")
+                .Range("A1:D1").value = Array("Список участников", "id", "Название клуба", "Время загрузки")
                 .Range("A1:D1").Font.Bold = True
 
                 .Columns("A:D").AutoFit
@@ -35,24 +35,24 @@ Private Function GetClubsSheet() As Worksheet
 
         Dim sh As Worksheet
         For Each sh In ThisWorkbook.Worksheets
-            If sh.Visible = xlSheetVisible And sh.Name <> SHEET_NAME And sh.Name <> BaseSheet.SHEET_NAME And sh.Name <> RanksSheet.SHEET_NAME Then
+            If sh.Visible = xlSheetVisible And sh.name <> SHEET_NAME And sh.name <> BaseSheet.SHEET_NAME And sh.name <> RanksSheet.SHEET_NAME Then
                 sh.Delete
             End If
         Next sh
 
         Set GetClubsSheet = ws
- CleanExit:
+CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
         Application.DisplayAlerts = True
      Exit Function
- ErrorHandler:
+ErrorHandler:
         MsgBox "Ошибка при создании листа клубов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function
 
 Public Sub AcceptClubs(clubsData As Object)
-    On Error Goto ErrorHandler
+    On Error GoTo ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
 
@@ -74,17 +74,17 @@ Public Sub AcceptClubs(clubsData As Object)
             sheetNames(clubId) = clSheet.name
 
             dataArr(clubId, 1) = clubId
-            dataArr(clubId, 2) = club.ClubName
-            dataArr(clubId, 3) = club.TimeStamp
+            dataArr(clubId, 2) = club.clubName
+            dataArr(clubId, 3) = club.timeStamp
             dataArr(clubId, 4) = DELETED
         Next clubKey
 
         With wsClubs
-            .Range("B2").Resize(UBound(dataArr, 1), 4).Value = dataArr
+            .Range("B2").Resize(UBound(dataArr, 1), 4).value = dataArr
 
             Dim i As Long
             For i = 1 To UBound(sheetNames)
-                .Hyperlinks.Add Anchor:=.Cells(i + 1, 1), Address:="", _ 
+                .Hyperlinks.Add Anchor:=.Cells(i + 1, 1), Address:="", _
                 SubAddress:="'" & sheetNames(i) & "'!A1", _
                 TextToDisplay:="Перейти к списку"
             Next i
@@ -94,11 +94,11 @@ Public Sub AcceptClubs(clubsData As Object)
             .Columns("A:E").AutoFit
             .Activate
         End With
- CleanExit:
+CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
      Exit Sub
- ErrorHandler:
+ErrorHandler:
         MsgBox "Ошибка при записи клубов в листы: " & Err.Description, vbCritical
         Resume CleanExit
 End Sub
@@ -106,8 +106,8 @@ End Sub
 Public Sub HandleSelectionChange(Target As Range)
     If Target.Column = 5 _
         And Target.Count = 1 _
-        And Target.Row > 1 _
-        And Target.Value = DELETED Then
+        And Target.row > 1 _
+        And Target.value = DELETED Then
 
         Dim mainRef As String: mainRef = ModuleSheet.GetSheetFromLink(wsClubs.Cells(Target.row, 1))
 

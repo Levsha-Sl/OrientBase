@@ -1,6 +1,6 @@
 VERSION 1.0 CLASS
 BEGIN
-MultiUse = -1  'True
+  MultiUse = -1  'True
 END
 Attribute VB_Name = "ThisWorkbook"
 Attribute VB_GlobalNameSpace = False
@@ -12,24 +12,24 @@ Private Sub Workbook_Open()
     DataSheets.InitApp
 End Sub
 
-Private Sub Workbook_SheetSelectionChange(Byval Sh As Object, Byval Target As Range)
-    Select Case Sh.name
+Private Sub Workbook_SheetSelectionChange(ByVal sh As Object, ByVal Target As Range)
+    Select Case sh.name
      Case ClubsSheet.SHEET_NAME
         Call ClubsSheet.HandleSelectionChange(Target)
-    End Select          
+    End Select
 End Sub
 
-Private Sub Workbook_SheetFollowHyperlink(Byval Sh As Object, Byval Target As Hyperlink)
-    Select Case Sh.name
+Private Sub Workbook_SheetFollowHyperlink(ByVal sh As Object, ByVal Target As Hyperlink)
+    Select Case sh.name
      Case ClubsSheet.SHEET_NAME
         ClubsSheet.HandleFollowHyperlink Target
-    End Select 
+    End Select
 End Sub
 
-Private Sub Workbook_SheetChange(Byval Sh As Object, Byval Target As Range)
+Private Sub Workbook_SheetChange(ByVal sh As Object, ByVal Target As Range)
     Dim hasChangesMart As Boolean: hasChangesMart = True
 
-    Select Case Sh.name
+    Select Case sh.name
      Case BaseSheet.SHEET_NAME
         hasChangesMart = BaseSheet.ChangesMart(Target)
      Case RanksSheet.SHEET_NAME
@@ -50,11 +50,12 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
     For Each sh In ThisWorkbook.Worksheets
     
         If sh.Visible = xlSheetVisible _
-        And sh.Name <> BaseSheet.SHEET_NAME _
-        And sh.Name <> RanksSheet.SHEET_NAME Then
+        And sh.name <> BaseSheet.SHEET_NAME _
+        And sh.name <> RanksSheet.SHEET_NAME Then
             sh.Delete
         End If
     Next sh
 
     Application.DisplayAlerts = True
 End Sub
+

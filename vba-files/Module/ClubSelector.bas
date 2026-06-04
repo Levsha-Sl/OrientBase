@@ -1,7 +1,7 @@
 Attribute VB_Name = "ClubSelector"
 Option Explicit
 
-Public Function ShowClubSelector(Byval clubs As Object) As Collection
+Public Function ShowClubSelector(ByVal clubs As Object) As Collection
     Dim frm As frmClubSelector
     Set frm = New frmClubSelector
 

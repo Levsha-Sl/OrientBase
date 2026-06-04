@@ -15,7 +15,7 @@ Public Sub Init()
     Set wsBase = GetBaseSheet
 End Sub
 
-Public Function CalculateRankExpiry(Byval rankDate As Variant, Byval targetRank As String) As Variant
+Public Function CalculateRankExpiry(ByVal rankDate As Variant, ByVal targetRank As String) As Variant
     If IsEmpty(rankDate) Or rankDate = "" Or targetRank = "" Then
         CalculateRankExpiry = ""
      Exit Function
@@ -34,7 +34,7 @@ Public Function CalculateRankExpiry(Byval rankDate As Variant, Byval targetRank 
         Err.Clear
      Exit Function
     End If
-    On Error Goto 0
+    On Error GoTo 0
 
         If addedYears <= 0 Then
             CalculateRankExpiry = ""
@@ -44,7 +44,7 @@ Public Function CalculateRankExpiry(Byval rankDate As Variant, Byval targetRank 
         CalculateRankExpiry = DateAdd("yyyy", addedYears, CDate(rankDate)) - 1
 End Function
 
-Public Function CalculateInsuranceExpiry(Byval insDate As Variant, Byval period As Variant) As Variant
+Public Function CalculateInsuranceExpiry(ByVal insDate As Variant, ByVal period As Variant) As Variant
     If IsEmpty(insDate) Or insDate = "" Or IsEmpty(period) Or period = "" Then
         CalculateInsuranceExpiry = ""
      Exit Function
@@ -64,7 +64,7 @@ Public Function CalculateInsuranceExpiry(Byval insDate As Variant, Byval period 
 End Function
 
 Public Function ChangesMart(Target As Range) As Boolean
-    On Error Goto ErrorHandler
+    On Error GoTo ErrorHandler
         Dim Result As Boolean: Result = True
         Dim rowIdx As Long: rowIdx = Target.row
         Dim colIdx As Long: colIdx = Target.Column
@@ -76,14 +76,14 @@ Public Function ChangesMart(Target As Range) As Boolean
             Dim stat As String, dateStat As Variant, dateIns As Variant, period As Variant, timeStamp As Variant
             Dim hasId As Boolean, hasData As Boolean
 
-            baseId = wsBase.Cells(rowIdx, 1).Value
-            fnm = wsBase.Cells(rowIdx, 2).Value
-            birth = IIf(IsEmpty(wsBase.Cells(rowIdx, 3).Value) Or wsBase.Cells(rowIdx, 3).Value = "", 0, CDate(wsBase.Cells(rowIdx, 3).Value))
+            baseId = wsBase.Cells(rowIdx, 1).value
+            fnm = wsBase.Cells(rowIdx, 2).value
+            birth = IIf(IsEmpty(wsBase.Cells(rowIdx, 3).value) Or wsBase.Cells(rowIdx, 3).value = "", 0, CDate(wsBase.Cells(rowIdx, 3).value))
 
-            stat = wsBase.Cells(rowIdx, 4).Value
-            dateStat = IIf(IsEmpty(wsBase.Cells(rowIdx, 5).Value) Or wsBase.Cells(rowIdx, 5).Value = "", Empty, CDate(wsBase.Cells(rowIdx, 5).Value))
-            dateIns = IIf(IsEmpty(wsBase.Cells(rowIdx, 7).Value) Or wsBase.Cells(rowIdx, 7).Value = "", Empty, CDate(wsBase.Cells(rowIdx, 7).Value))
-            period = IIf(IsEmpty(wsBase.Cells(rowIdx, 8).Value) Or wsBase.Cells(rowIdx, 8).Value = "", Empty, CLng(wsBase.Cells(rowIdx, 8).Value))
+            stat = wsBase.Cells(rowIdx, 4).value
+            dateStat = IIf(IsEmpty(wsBase.Cells(rowIdx, 5).value) Or wsBase.Cells(rowIdx, 5).value = "", Empty, CDate(wsBase.Cells(rowIdx, 5).value))
+            dateIns = IIf(IsEmpty(wsBase.Cells(rowIdx, 7).value) Or wsBase.Cells(rowIdx, 7).value = "", Empty, CDate(wsBase.Cells(rowIdx, 7).value))
+            period = IIf(IsEmpty(wsBase.Cells(rowIdx, 8).value) Or wsBase.Cells(rowIdx, 8).value = "", Empty, CLng(wsBase.Cells(rowIdx, 8).value))
             timeStamp = Format$(Now, "dd.mm.yyyy")
 
             hasId = (baseId > 0)
@@ -92,24 +92,24 @@ Public Function ChangesMart(Target As Range) As Boolean
             If Not hasId Then
                 ' ID пуст: INSERT если есть все данные
                 If hasData Then
-                    wsBase.Cells(rowIdx, 1).Value = Base.CreateBase(fnm, birth, stat, dateStat, dateIns, period, timeStamp)
-                    wsBase.Cells(rowIdx, 10).Value = timeStamp
+                    wsBase.Cells(rowIdx, 1).value = Base.CreateBase(fnm, birth, stat, dateStat, dateIns, period, timeStamp)
+                    wsBase.Cells(rowIdx, 10).value = timeStamp
                 End If
             Else
                 ' ID не пуст: UPDATE если данные есть, DELETE если нет
                 If hasData Then
                     Call Base.UpdateBase(fnm, birth, stat, dateStat, dateIns, period, timeStamp, baseId)
-                    wsBase.Cells(rowIdx, 10).Value = timeStamp
+                    wsBase.Cells(rowIdx, 10).value = timeStamp
                 Else
-                    wsBase.Cells(rowIdx, 1).Value = IIf(Base.DeleteBase(baseId), "", baseId)
+                    wsBase.Cells(rowIdx, 1).value = IIf(Base.DeleteBase(baseId), "", baseId)
                 End If
             End If
         End If
- CleanExit:
+CleanExit:
         ChangesMart = Result
         Application.EnableEvents = True
      Exit Function
- ErrorHandler:
+ErrorHandler:
         Select Case Err.Number
          Case vbObjectError + 1201
             MsgBox Err.Description, vbExclamation, "Ошибка изменения данных"
@@ -124,7 +124,7 @@ Public Sub AcceptBaseData(martArr As Variant)
     Application.EnableEvents = False
     Application.ScreenUpdating = False
 
-    wsBase.Range("A6").Resize(Base.getMaxId, 10).Value = martArr
+    wsBase.Range("A6").Resize(Base.getMaxId, 10).value = martArr
     wsBase.Columns("A:J").AutoFit
 
     Set tblBase = GetTableBase
@@ -134,7 +134,7 @@ Public Sub AcceptBaseData(martArr As Variant)
 End Sub
 
 Private Function GetBaseSheet() As Worksheet
-    On Error Goto ErrorHandler
+    On Error GoTo ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
         Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName(BaseSheet.SHEET_NAME)
@@ -144,7 +144,7 @@ Private Function GetBaseSheet() As Worksheet
 
             With ws
                 .name = BaseSheet.SHEET_NAME
-                .Range("A5:J5").Value = Array("id", "ФИО", "День рож.", COL_RANK, COL_RANK_DATE, COL_RANK_EXPIRY, COL_INS_DATE, COL_PERIOD, COL_INS_EXPIRY, COL_TIME_STEMP)
+                .Range("A5:J5").value = Array("id", "ФИО", "День рож.", COL_RANK, COL_RANK_DATE, COL_RANK_EXPIRY, COL_INS_DATE, COL_PERIOD, COL_INS_EXPIRY, COL_TIME_STEMP)
                 .Range("A5:J5").Font.Bold = True
 
                 With .Columns("A:J")
@@ -176,11 +176,11 @@ Private Function GetBaseSheet() As Worksheet
         End If
 
         Set GetBaseSheet = ws
- CleanExit:
+CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
      Exit Function
- ErrorHandler:
+ErrorHandler:
         MsgBox "Ошибка при создании листа спортсменнов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function

@@ -13,7 +13,7 @@ Public Function Init() As Worksheet
     If wsRanksData Is Nothing Then
         ' (STAT)key PERIODAGE
         Set wsRanksData = DataSheets.GetSheet("Ranks")
-        If wsRanksData.Cells(1, 1).Value = "" Then
+        If wsRanksData.Cells(1, 1).value = "" Then
             Call LoadPrimaryRanks
         End If
     End If
@@ -44,7 +44,7 @@ Public Sub LoadToMart()
     Application.EnableEvents = False
     Application.ScreenUpdating = False
 
-    RanksSheet.wsRanks.Range("A2").Resize(MaxId, 3).Value = martArr
+    RanksSheet.wsRanks.Range("A2").Resize(MaxId, 3).value = martArr
     RanksSheet.wsRanks.Columns("A:C").AutoFit
 
     Application.EnableEvents = True
@@ -66,7 +66,7 @@ Public Sub SaveChanges()
         With wsRanksData
             Dim lastRow As Long: lastRow = UBound(getRanks, 1)
             .Range("A1").Resize(lastRow, TotalCols).ClearContents
-            .Range("A1").Resize(totalRows, TotalCols).Value = resultRanks
+            .Range("A1").Resize(totalRows, TotalCols).value = resultRanks
         End With
     End If
     Call LoadToMart
@@ -124,12 +124,12 @@ Private Sub LoadPrimaryRanks()
     primaryRanks = [{"áð",0;"IIIþ",2;"IIþ",2;"Iþ",2;"III",2;"II",2;"I",2;"ÊÌÑ",2;"ÌÑ",3;"ÌÑÌÊ",0}]
     rowsCount = UBound(primaryRanks, 1)
 
-    wsRanksData.Range("A1:B" & rowsCount).Value = primaryRanks
+    wsRanksData.Range("A1:B" & rowsCount).value = primaryRanks
 End Sub
 
 Private Function getRanks() As Variant
     Dim lastRow As Long, lastCol As Long
     lastRow = wsRanksData.Cells(wsRanksData.Rows.Count, 1).End(xlUp).row
     lastCol = 2
-    getRanks = wsRanksData.Range(wsRanksData.Cells(1, 1), wsRanksData.Cells(lastRow, lastCol)).Value
+    getRanks = wsRanksData.Range(wsRanksData.Cells(1, 1), wsRanksData.Cells(lastRow, lastCol)).value
 End Function

@@ -15,7 +15,7 @@ Public Function Init() As Worksheet
     If wsBaseData Is Nothing Then
         ' (FNM BIRTH)key STAT DATESTAT DATEINS PERIOD
         Set wsBaseData = DataSheets.GetSheet("Base")
-        If wsBaseData.Cells(1, 1).Value = "" Then
+        If wsBaseData.Cells(1, 1).value = "" Then
             Call LoadPrimaryBase
         End If
     End If
@@ -78,7 +78,7 @@ Public Sub SaveChanges()
         With wsBaseData
             Dim lastRow As Long: lastRow = UBound(GetBaseData, 1)
             .Range("A1").Resize(lastRow, TotalCols).ClearContents
-            .Range("A1").Resize(totalRows, TotalCols).Value = resultBase
+            .Range("A1").Resize(totalRows, TotalCols).value = resultBase
         End With
     End If
     Call LoadToMart
@@ -162,7 +162,7 @@ Public Sub Export()
     If filePath = False Then Exit Sub
 
         lastRow = wsBaseData.Cells(wsBaseData.Rows.Count, 1).End(xlUp).row
-        baseArr = wsBaseData.Range(wsBaseData.Cells(1, 1), wsBaseData.Cells(lastRow, TotalCols)).Value
+        baseArr = wsBaseData.Range(wsBaseData.Cells(1, 1), wsBaseData.Cells(lastRow, TotalCols)).value
 
         fNum = FreeFile
         Open filePath For Output As #fNum
@@ -187,11 +187,11 @@ Public Sub Export()
 End Sub
 
 Private Sub LoadPrimaryBase()
-    wsBaseData.Range("A1:G1").Value = Array("Гордон Фриман", "19.10.1982", "МСМК", "03.05.2020", "01.01.2026", "365", Format$(Now, "dd.mm.yyyy"))
+    wsBaseData.Range("A1:G1").value = Array("Гордон Фриман", "19.10.1982", "МСМК", "03.05.2020", "01.01.2026", "365", Format$(Now, "dd.mm.yyyy"))
 End Sub
 
 Private Function GetBaseData() As Variant
     Dim lastRow As Long, lastCol As Long
     lastRow = wsBaseData.Cells(wsBaseData.Rows.Count, 1).End(xlUp).row
-    GetBaseData = wsBaseData.Range(wsBaseData.Cells(1, 1), wsBaseData.Cells(lastRow, TotalCols)).Value
+    GetBaseData = wsBaseData.Range(wsBaseData.Cells(1, 1), wsBaseData.Cells(lastRow, TotalCols)).value
 End Function
