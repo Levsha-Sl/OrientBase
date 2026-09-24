@@ -1,4 +1,5 @@
 Attribute VB_Name = "ClubsListData"
+Option Private Module
 
 Private ClubsList As Object
 Private CombinedClubsList As Object

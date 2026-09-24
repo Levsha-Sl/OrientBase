@@ -1,4 +1,5 @@
 Attribute VB_Name = "RanksData"
+Option Private Module
 Public Const SHEET_NAME As String = "Ranks"
 
 Public wsRanksData As Worksheet

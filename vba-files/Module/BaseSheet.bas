@@ -1,4 +1,5 @@
 Attribute VB_Name = "BaseSheet"
+Option Private Module
 Public wsBase As Worksheet
 Private tblBase As ListObject
 
@@ -126,6 +127,26 @@ Private Function GetBaseSheet() As Worksheet
                     .Caption = "Импорт c Orgeo"
                 End With
 
+                Dim BtnExportBase As Object: Set BtnExportBase = ws.Buttons.Add( _
+                Left:=ws.Cells(1, 8).Left, _
+                Top:=ws.Cells(1, 8).Top, _
+                Width:=ws.Cells(1, 8).Width + ws.Cells(1, 9).Width, _
+                Height:=ws.Cells(1, 1).Height)
+                With BtnExportBase
+                    .OnAction = "BaseSheet.BtnExportBase"
+                    .Caption = "Экспорт базы"
+                End With
+
+                Dim BtnImportBase As Object: Set BtnImportBase = ws.Buttons.Add( _
+                Left:=ws.Cells(3, 8).Left, _
+                Top:=ws.Cells(3, 8).Top, _
+                Width:=ws.Cells(3, 8).Width + ws.Cells(3, 9).Width, _
+                Height:=ws.Cells(3, 1).Height)
+                With BtnImportBase
+                    .OnAction = "BaseSheet.BtnImportBase"
+                    .Caption = "Импорт базы"
+                End With
+
             End With
         End If
 
@@ -144,6 +165,16 @@ Private Sub BtnSave()
         tblBase.DataBodyRange.Delete
     End If
     Call Base.SaveChanges
+End Sub
+
+Private Sub BtnExportBase()
+    BtnSave
+    Base.Export
+End Sub
+
+Private Sub BtnImportBase()
+    BtnSave
+    Base.Import
 End Sub
 
 Private Sub BtnImportOrgeo()

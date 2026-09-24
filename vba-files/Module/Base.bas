@@ -1,4 +1,5 @@
 Attribute VB_Name = "Base"
+Option Private Module
 Public wsBaseData As Worksheet
 ' (FNM#BIRTH)key STAT DATESTAT DATEINS PERIOD
 Private BaseDict As Object

@@ -1,4 +1,5 @@
 Attribute VB_Name = "ClubsSheet"
+Option Private Module
 Public wsClubs As Worksheet
 
 Public Const SHEET_NAME As String = "Клубы"
