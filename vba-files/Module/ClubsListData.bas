@@ -117,20 +117,28 @@ Public Sub SetClubInCombinedList(idClub As Long)
     localStatuses = arrStatus
 
     Dim stat As String
+    Dim importedData As Variant
     Dim status As String
     Dim arrData As Variant
     Dim defaultRow As Variant
 
     For Each pKey In club.Participants.Keys
-        stat = club.Participants.Item(pKey)
-
-        defaultRow = Array("",stat,"","","") 'ID STAT DATESTAT DATEINS PERIOD
+        importedData = club.Participants.Item(pKey)
+        If IsArray(importedData) Then
+            ' Импорт базы уже содержит даты разряда и страховки, а также период.
+            defaultRow = importedData
+        Else
+            stat = CStr(importedData)
+            defaultRow = Array("",stat,"","","") 'ID STAT DATESTAT DATEINS PERIOD
+        End If
         Dim keyParts As Variant: keyParts = Split(pKey, "#")
         arrData = Base.GetParticipant(CStr(keyParts(0)), CDate(keyParts(1)))
 
         If IsArray(arrData) Then
             status = localStatuses(0)
-            If stat = arrData(1) Then
+            If IsArray(importedData) Then
+                defaultRow(0) = arrData(0)
+            ElseIf stat = arrData(1) Then
                 defaultRow = arrData
             Else
                 defaultRow(0) = arrData(0)

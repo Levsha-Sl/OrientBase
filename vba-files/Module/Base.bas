@@ -198,44 +198,27 @@ Public Sub AcceptOrgeoClub(participant As Object)
     SaveChanges
 End Sub
 
-' TODO ниже код не трогать
 Public Sub Import()
+    On Error GoTo ErrorHandler
+
     Dim list As Collection
-    Set list = ModuleCSV.OpenCSVFile()
+    Set list = ModuleCSV.OpenCSVFile("windows-1251", "FNM;BIRTH;STAT;DATESTAT;DATEINS;PERIOD;TIMESTAMP")
     If list Is Nothing Then Exit Sub
+    If list.Count = 0 Then
+        MsgBox "В файле нет участников для импорта.", vbInformation
+        Exit Sub
+    End If
 
-    Dim lineVariant As Variant
-    Dim lineStr As String
-    Dim items() As String
-    Dim rowNum As Long
-    Dim colNum As Long
-    Dim currentTimestamp As Date
-    
-    currentTimestamp = Now() ' Фиксируем время один раз
-    rowNum = 1 ' Начинаем запись с первой строки (A1)
+    Dim clubsData As Object
+    Set clubsData = ParseAthletes(list)
 
-    ' Отключаем обновление экрана для ускорения работы
-    Application.ScreenUpdating = False
+    Dim selectedClubName As New Collection
+    selectedClubName.Add "Import"
+    ClubsListData.InitLists selectedClubName, clubsData
+    Exit Sub
 
-    For Each lineVariant In list
-        lineStr = CStr(lineVariant)
-        
-        ' Разбиваем строку на массив элементов по точке с запятой
-        items = Split(lineStr, ";")
-        
-        ' Записываем элементы строки в ячейки
-        For colNum = 0 To UBound(items)
-            wsBaseData.Cells(rowNum, colNum + 1).Value = items(colNum)
-        Next colNum
-        
-        ' В последний дополнительный столбец записываем TimeStamp
-        wsBaseData.Cells(rowNum, UBound(items) + 2).Value = currentTimestamp
-        
-        rowNum = rowNum + 1 ' Переходим на следующую строку
-    Next lineVariant
-
-    Application.ScreenUpdating = True
-    MsgBox "Данные успешно импортированы!", vbInformation
+ErrorHandler:
+    MsgBox "Ошибка импорта: " & Err.Description, vbExclamation
 End Sub
 
 Public Sub Export()
@@ -298,52 +281,67 @@ Private Sub SetUnBaseKeys()
 End Sub
 
 '/*
-' Dictionary Kay:"clubName" Value: "athleteDict"
-' Dictionary Key:"FIO#BD" Value: "stat"
+' Dictionary Key: "Import" Value: athleteDict
+' Dictionary Key: "FIO#BD" Value: ID STAT DATESTAT DATEINS PERIOD
 '*/
 Private Function ParseAthletes(lines As Collection) As Object
     Dim clubs As Object
-
     Dim athleteDict As Object
-    Dim lineData As String
+    Set clubs = CreateObject("Scripting.Dictionary"): clubs.CompareMode = 1
+    Set athleteDict = CreateObject("Scripting.Dictionary"): athleteDict.CompareMode = 1
+
     Dim cols() As String
     Dim athleteKey As String
-
-    Dim rank As String
-    Dim bd As String
-
-    Dim dataP(0 to 5) As Variant
-    Dim i As Long
-    Dim clubName As String: clubName = "Import"
-
-    Set clubs = CreateObject("Scripting.Dictionary")
-    clubs.CompareMode = 1
-    Set dataP = CreateObject("Scripting.Dictionary")
-    dataP.CompareMode = 1
+    Dim dataP As Variant
+    Dim i As Long, j As Long
+    Dim rowLabel As String
+    Dim insurancePeriod As Double
 
     For i = 1 To lines.Count
-        lineData = lines(i)
-        cols = Split(lineData, ";")
-
-        ' ФИО#ДР Разряд
-        If UBound(cols) >= 5 Then
-            athleteKey = Trim(cols(0))
-            
-            bd = Trim(cols(1))
-            rank = Trim(cols(2))
-            rank = Trim(cols(2))
-            rank = Trim(cols(2))
-
-            If Not clubs.Exists(clubName) Then
-                Set athleteDict = CreateObject("Scripting.Dictionary")
-                clubs.Add clubName, athleteDict
-            Else
-                Set athleteDict = clubs(clubName)
-            End If
-
-            athleteDict.Add athleteKey, dataP
+        rowLabel = "Запись " & i & ": "
+        cols = Split(CStr(lines(i)), ";")
+        If UBound(cols) <> 6 Then
+            Err.Raise vbObjectError + 1202, "Base.ParseAthletes", rowLabel & "ожидается 7 столбцов."
         End If
+        For j = 0 To UBound(cols)
+            cols(j) = Trim$(cols(j))
+        Next j
+
+        If cols(0) = "" Or InStr(cols(0), "#") > 0 Then
+            Err.Raise vbObjectError + 1202, "Base.ParseAthletes", rowLabel & "некорректное ФИО."
+        End If
+        If Not IsDate(cols(1)) Then
+            Err.Raise vbObjectError + 1202, "Base.ParseAthletes", rowLabel & "неверная дата рождения."
+        End If
+        athleteKey = cols(0) & "#" & Format$(CDate(cols(1)), "dd.mm.yyyy")
+        If athleteDict.Exists(athleteKey) Then
+            Err.Raise vbObjectError + 1202, "Base.ParseAthletes", rowLabel & "повтор участника " & cols(0) & "."
+        End If
+
+        dataP = Array("", cols(2), "", "", "")
+        For j = 3 To 4
+            If cols(j) <> "" Then
+                If Not IsDate(cols(j)) Then
+                    Err.Raise vbObjectError + 1202, "Base.ParseAthletes", rowLabel & "неверная дата в столбце " & (j + 1) & "."
+                End If
+                dataP(j - 1) = CDate(cols(j))
+            End If
+        Next j
+        If cols(5) <> "" Then
+            If Not IsNumeric(cols(5)) Then
+                Err.Raise vbObjectError + 1202, "Base.ParseAthletes", rowLabel & "неверный период страховки."
+            End If
+            insurancePeriod = CDbl(cols(5))
+            If insurancePeriod < 0 Or insurancePeriod > 2147483647# Or insurancePeriod <> Fix(insurancePeriod) Then
+                Err.Raise vbObjectError + 1202, "Base.ParseAthletes", rowLabel & "период страховки должен быть целым неотрицательным числом."
+            End If
+            dataP(4) = CLng(insurancePeriod)
+        End If
+
+        ' TIMESTAMP обновляется при выгрузке проверенного списка в базу, как у Orgeo.
+        athleteDict.Add athleteKey, dataP
     Next i
 
+    clubs.Add "Import", athleteDict
     Set ParseAthletes = clubs
 End Function

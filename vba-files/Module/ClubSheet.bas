@@ -234,6 +234,8 @@ Private Sub setLogicTable(ws As Worksheet, size As Long)
     End If 
 
     With tbl
+        .ListColumns(COL_RANK_DATE).Range.HorizontalAlignment = xlLeft
+        .ListColumns(COL_INS_DATE).Range.HorizontalAlignment = xlLeft
         .ListColumns(COL_RANK_EXPIRY).DataBodyRange.FormulaLocal = _
         "=ModuleSheet.CalculateRankExpiry([@[" & COL_RANK_DATE & "]]; [@" & COL_RANK & "])"
         .ListColumns(COL_INS_EXPIRY).DataBodyRange.FormulaLocal = _
