@@ -9,7 +9,7 @@ Public Sub Init()
 End Sub
 
 Private Function GetClubsSheet() As Worksheet
-    On Error GoTo ErrorHandler
+    On Error Goto ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
 
@@ -35,92 +35,103 @@ Private Function GetClubsSheet() As Worksheet
 
         Dim sh As Worksheet
         For Each sh In ThisWorkbook.Worksheets
-            If sh.Visible = xlSheetVisible And sh.name <> SHEET_NAME And sh.name <> BaseSheet.SHEET_NAME And sh.name <> RanksSheet.SHEET_NAME Then
+            If sh.Visible = xlSheetVisible And sh.name <> ClubsSheet.SHEET_NAME And sh.name <> BaseSheet.SHEET_NAME And sh.name <> RanksSheet.SHEET_NAME Then
                 sh.Delete
             End If
         Next sh
 
         Set GetClubsSheet = ws
-CleanExit:
+ CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
         Application.DisplayAlerts = True
      Exit Function
-ErrorHandler:
+ ErrorHandler:
         MsgBox "Ошибка при создании листа клубов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function
 
 Public Sub AcceptClubs(clubsData As Object)
-    On Error GoTo ErrorHandler
-        Application.EnableEvents = False
-        Application.ScreenUpdating = False
+    '    On Error Goto ErrorHandler
+    Application.EnableEvents = False
+    Application.ScreenUpdating = False
 
-        Dim clubKey As Variant
-        Dim clubId As Long
-        Dim club As ClubModule
-        Dim clSheet As Worksheet
+    Dim clubKey As Variant
+    Dim clubId As Long
+    Dim club As ClubModule
+    Dim clSheet As Worksheet
 
-        Dim dataArr()
-        Dim sheetNames()
+    Dim dataArr()
+    Dim sheetNames()
 
-        ReDim dataArr(1 To clubsData.Count, 1 To 4)
-        ReDim sheetNames(1 To clubsData.Count)
+    ReDim dataArr(1 To clubsData.Count, 1 To 4)
+    ReDim sheetNames(1 To clubsData.Count)
 
-        For Each clubKey In clubsData.Keys
-            clubId = CLng(clubKey)
-            Set club = clubsData.Item(clubId)
-            Set clSheet = ClubSheet.GetClubSheet(clubId, club)
-            sheetNames(clubId) = clSheet.name
+    For Each clubKey In clubsData.Keys
+        clubId = CLng(clubKey)
+        Set club = clubsData.Item(clubId)
+        Set clSheet = ClubSheet.GetClubSheet(clubId, club)
+        sheetNames(clubId) = clSheet.name
 
-            dataArr(clubId, 1) = clubId
-            dataArr(clubId, 2) = club.clubName
-            dataArr(clubId, 3) = club.timeStamp
-            dataArr(clubId, 4) = DELETED
-        Next clubKey
+        dataArr(clubId, 1) = clubId
+        dataArr(clubId, 2) = club.clubName
+        dataArr(clubId, 3) = club.timeStamp
+        dataArr(clubId, 4) = DELETED
+    Next clubKey
 
-        With wsClubs
-            .Range("B2").Resize(UBound(dataArr, 1), 4).value = dataArr
+    With wsClubs
+        .Range("B2").Resize(UBound(dataArr, 1), 4).value = dataArr
 
-            Dim i As Long
-            For i = 1 To UBound(sheetNames)
-                .Hyperlinks.Add Anchor:=.Cells(i + 1, 1), Address:="", _
-                SubAddress:="'" & sheetNames(i) & "'!A1", _
-                TextToDisplay:="Перейти к списку"
-            Next i
+        Dim i As Long
+        For i = 1 To UBound(sheetNames)
+            .Hyperlinks.Add Anchor:=.Cells(i + 1, 1), Address:="", _
+            SubAddress:="'" & sheetNames(i) & "'!A1", _
+            TextToDisplay:="Перейти к списку"
+        Next i
 
-            .Columns(4).NumberFormat = "dd.mm.yyyy hh:mm:ss"
-            .Columns(5).Font.Color = vbRed
-            .Columns("A:E").AutoFit
-            .Activate
-        End With
-CleanExit:
-        Application.EnableEvents = True
-        Application.ScreenUpdating = True
-     Exit Sub
-ErrorHandler:
-        MsgBox "Ошибка при записи клубов в листы: " & Err.Description, vbCritical
-        Resume CleanExit
+        .Columns(4).NumberFormat = "dd.mm.yyyy hh:mm:ss"
+        .Columns(5).Font.Color = vbRed
+        .Columns("A:E").AutoFit
+        .Activate
+    End With
+    ' CleanExit:
+    Application.EnableEvents = True
+    Application.ScreenUpdating = True
+    '     Exit Sub
+    ' ErrorHandler:
+    '        MsgBox "Ошибка при записи клубов в листы: " & Err.Description, vbCritical
+    '        Resume CleanExit
 End Sub
 
 Public Sub HandleSelectionChange(Target As Range)
-    If Target.Column = 5 _
-        And Target.Count = 1 _
-        And Target.row > 1 _
-        And Target.value = DELETED Then
+    If Target.Column = 5 And Target.Count = 1 And Target.row > 1 Then
+        If Target.value = DELETED Then
 
-        Dim mainRef As String: mainRef = ModuleSheet.GetSheetFromLink(wsClubs.Cells(Target.row, 1))
+            Dim mainRef As String: mainRef = ModuleSheet.GetSheetFromLink(wsClubs.Cells(Target.row, 1))
 
-        If MsgBox("Удалить лист клуба?", vbYesNo + vbQuestion) = vbYes Then
+            If MsgBox("Удалить лист клуба?", vbYesNo + vbQuestion) = vbYes Then
 
-            Application.DisplayAlerts = False
+                Application.DisplayAlerts = False
 
-            ModuleSheet.DeleteSheetIfExists mainRef
-            Target.EntireRow.Delete
+                ModuleSheet.DeleteSheetIfExists mainRef
+                Target.EntireRow.Delete
 
-            Application.DisplayAlerts = True
+                Application.DisplayAlerts = True
+            End If
         End If
     End If
+End Sub
+
+Public Sub DeleteClub(id As Long)
+    Application.DisplayAlerts = False
+
+    Dim rowNum As Variant
+    rowNum = Application.Match(id, wsClubs.Columns("B"), 0)
+    Dim mainRef As String: mainRef = ModuleSheet.GetSheetFromLink(wsClubs.Cells(rowNum, 1))
+    ModuleSheet.DeleteSheetIfExists mainRef
+    wsClubs.Rows(rowNum).Delete
+
+    Application.DisplayAlerts = True
 End Sub
 
 Public Sub HandleFollowHyperlink(Target As Hyperlink)

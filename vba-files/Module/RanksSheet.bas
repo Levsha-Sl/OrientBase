@@ -7,7 +7,7 @@ Public Sub Init()
     Set wsRanks = GetRanksSheet
 End Sub
 
-Public Function ChangesMart(Target As Range) As Boolean
+Public Function ChangesShowcase(Target As Range) As Boolean
     On Error Goto ErrorHandler
         Dim Result As Boolean: Result = True
         Dim rowIdx As Long: rowIdx = Target.row
@@ -29,19 +29,19 @@ Public Function ChangesMart(Target As Range) As Boolean
             If Not hasId Then
                 ' ID пуст: INSERT если есть все данные
                 If hasData Then
-                    wsRanks.Cells(rowIdx, 1).value = ranks.CreateRank(rankName, periodValue)
+                    wsRanks.Cells(rowIdx, 1).value = RanksData.CreateRank(rankName, periodValue)
                 End If
             Else
                 ' ID не пуст: UPDATE если данные есть, DELETE если нет
                 If hasData Then
-                    Call ranks.UpdateRank(rankName, periodValue, rankId)
+                    Call RanksData.UpdateRank(rankName, periodValue, rankId)
                 Else
-                    wsRanks.Cells(rowIdx, 1).value = IIf(ranks.DeleteRank(rankId), "", rankId)
+                    wsRanks.Cells(rowIdx, 1).value = IIf(RanksData.DeleteRank(rankId), "", rankId)
                 End If
             End If
         End If
  CleanExit:
-        ChangesMart = Result
+        ChangesShowcase = Result
         Application.EnableEvents = True
      Exit Function
  ErrorHandler:
@@ -103,6 +103,6 @@ Private Function GetRanksSheet() As Worksheet
 End Function
 
 Private Sub BtnSave()
-    wsRanks.Range("A2").Resize(ranks.getMaxId(), 3).ClearContents
-    Call ranks.SaveChanges
+    wsRanks.Range("A2").Resize(RanksData.getMaxId(), 3).ClearContents
+    Call RanksData.SaveChanges
 End Sub

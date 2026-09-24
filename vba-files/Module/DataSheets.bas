@@ -2,27 +2,27 @@ Attribute VB_Name = "DataSheets"
 ' TODO Debag
 Public Sub InitApp()
     InitData
-    InitMarts
+    InitShowcases
 
-    LoadAllDataToMarts
+    LoadAllDataToShowcases
 End Sub
 
 Private Sub InitData()
-    Ranks.Init  'wsRanksData
+    RanksData.Init  'wsRanksData
     Base.Init   'wsBaseData
     ' Clubs.Init  'wsClubsData
 End Sub
 
-Private Sub InitMarts()
+Private Sub InitShowcases()
     RanksSheet.Init  'wsRanks
     BaseSheet.Init 'wsBase
     ' ClubsSheet.Init  'wsClubs
 End Sub
 
-Private Sub LoadAllDataToMarts()
-    Ranks.LoadToMart
-    Base.LoadToMart
-    ' Clubs.LoadToMart
+Private Sub LoadAllDataToShowcases()
+    RanksData.LoadToShowcase
+    Base.LoadToShowcase
+    ' Clubs.LoadToShowcase
 End Sub
 
 Public Function GetSheet(name As String) As Worksheet

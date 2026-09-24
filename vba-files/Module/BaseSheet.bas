@@ -15,56 +15,8 @@ Public Sub Init()
     Set wsBase = GetBaseSheet
 End Sub
 
-Public Function CalculateRankExpiry(ByVal rankDate As Variant, ByVal targetRank As String) As Variant
-    If IsEmpty(rankDate) Or rankDate = "" Or targetRank = "" Then
-        CalculateRankExpiry = ""
-     Exit Function
-    End If
-
-    If Not IsDate(rankDate) Then
-        CalculateRankExpiry = CVErr(xlErrValue) ' Возвращаем #ЗНАЧ!
-     Exit Function
-    End If
-
-    On Error Resume Next
-    Dim addedYears As Long
-    addedYears = ranks.GetRankValue(targetRank)
-    If Err.Number <> 0 Then
-        CalculateRankExpiry = CVErr(xlErrValue)
-        Err.Clear
-     Exit Function
-    End If
-    On Error GoTo 0
-
-        If addedYears <= 0 Then
-            CalculateRankExpiry = ""
-         Exit Function
-        End If
-
-        CalculateRankExpiry = DateAdd("yyyy", addedYears, CDate(rankDate)) - 1
-End Function
-
-Public Function CalculateInsuranceExpiry(ByVal insDate As Variant, ByVal period As Variant) As Variant
-    If IsEmpty(insDate) Or insDate = "" Or IsEmpty(period) Or period = "" Then
-        CalculateInsuranceExpiry = ""
-     Exit Function
-    End If
-
-    If Not IsDate(insDate) Or Not IsNumeric(period) Then
-        CalculateInsuranceExpiry = CVErr(xlErrValue)
-     Exit Function
-    End If
-
-    If CLng(period) <= 0 Then
-        CalculateInsuranceExpiry = ""
-     Exit Function
-    End If
-
-    CalculateInsuranceExpiry = CDate(insDate) + CLng(period) - 1
-End Function
-
-Public Function ChangesMart(Target As Range) As Boolean
-    On Error GoTo ErrorHandler
+Public Function ChangesShowcase(Target As Range) As Boolean
+    On Error Goto ErrorHandler
         Dim Result As Boolean: Result = True
         Dim rowIdx As Long: rowIdx = Target.row
         Dim colIdx As Long: colIdx = Target.Column
@@ -105,12 +57,14 @@ Public Function ChangesMart(Target As Range) As Boolean
                 End If
             End If
         End If
-CleanExit:
-        ChangesMart = Result
+ CleanExit:
+        ChangesShowcase = Result
         Application.EnableEvents = True
      Exit Function
-ErrorHandler:
+ ErrorHandler:
         Select Case Err.Number
+         Case 13
+            MsgBox "Ошибка: Неверный формат данных!", vbCritical, "Ошибка 13"
          Case vbObjectError + 1201
             MsgBox Err.Description, vbExclamation, "Ошибка изменения данных"
          Case Else
@@ -134,7 +88,7 @@ Public Sub AcceptBaseData(martArr As Variant)
 End Sub
 
 Private Function GetBaseSheet() As Worksheet
-    On Error GoTo ErrorHandler
+    On Error Goto ErrorHandler
         Application.EnableEvents = False
         Application.ScreenUpdating = False
         Dim ws As Worksheet: Set ws = ModuleSheet.GetSheetByName(BaseSheet.SHEET_NAME)
@@ -176,11 +130,11 @@ Private Function GetBaseSheet() As Worksheet
         End If
 
         Set GetBaseSheet = ws
-CleanExit:
+ CleanExit:
         Application.EnableEvents = True
         Application.ScreenUpdating = True
      Exit Function
-ErrorHandler:
+ ErrorHandler:
         MsgBox "Ошибка при создании листа спортсменнов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function
@@ -193,38 +147,8 @@ Private Sub BtnSave()
 End Sub
 
 Private Sub BtnImportOrgeo()
-    Dim clubsData As Object
-    Dim clubsView As Object
-    Dim selected As Collection
-
-    Set clubsData = ParseAthletes(ModuleCSV.OpenCSVFile())
-    Set clubsView = CreateObject("Scripting.Dictionary"): clubsView.CompareMode = 1
-
-    For Each key In clubsData.Keys
-        clubsView.Add key, clubsData.Item(key).Count
-    Next key
-
-    Set selected = ShowClubSelector(clubsView)
-    If selected Is Nothing Then
-        MsgBox "Отмена", vbInformation
-     Exit Sub
-    End If
-
-    Dim newClubsData As Object
-    Set newClubsData = CreateObject("Scripting.Dictionary"): newClubsData.CompareMode = 1
-
-    Dim club As ClubModule
-    Dim clubInSelected As Variant
-    Dim time As Date: time = Now
-    Dim i As Long: i = 0
-    For Each clubInSelected In selected
-        Set club = New ClubModule
-        club.Init clubInSelected, time, clubsData.Item(clubInSelected)
-        i = i + 1
-        newClubsData.Add i, club
-    Next clubInSelected
-
-    ClubsList.Init newClubsData
+    BtnSave
+    ClubsListData.Init
 End Sub
 
 Private Function GetTableBase() As ListObject
@@ -264,7 +188,7 @@ Private Function GetTableBase() As ListObject
             colTimeStamp = Split(tbl.ListColumns(COL_TIME_STEMP).DataBodyRange.Cells(1).Address, "$")(1)
 
             With rngStat
-                Dim ranksVlookup As String: ranksVlookup = "ВПР($" & colRank & firstRow & ";Ranks!$A$1:$B$" & ranks.getMaxId & ";2;0)"
+                Dim ranksVlookup As String: ranksVlookup = "ВПР($" & colRank & firstRow & ";" & RanksData.SHEET_NAME & "!$A$1:$B$" & RanksData.getMaxId & ";2;0)"
 
                 .FormatConditions.Delete
                 ' Красное (просрочено или пусто)
@@ -315,47 +239,10 @@ Private Function GetTableBase() As ListObject
 
     With tbl
         .ListColumns(COL_RANK_EXPIRY).DataBodyRange.FormulaLocal = _
-        "=BaseSheet.CalculateRankExpiry([@[" & COL_RANK_DATE & "]]; [@" & COL_RANK & "])"
+        "=ModuleSheet.CalculateRankExpiry([@[" & COL_RANK_DATE & "]]; [@" & COL_RANK & "])"
         .ListColumns(COL_INS_EXPIRY).DataBodyRange.FormulaLocal = _
-        "=BaseSheet.CalculateInsuranceExpiry([@[" & COL_INS_DATE & "]]; [@" & COL_PERIOD & "])"
+        "=ModuleSheet.CalculateInsuranceExpiry([@[" & COL_INS_DATE & "]]; [@" & COL_PERIOD & "])"
     End With
 
     Set GetTableBase = tbl
-End Function
-
-Private Function ParseAthletes(lines As Collection) As Object
-    Dim clubs As Object
-
-    Dim athleteDict As Object
-    Dim lineData As String
-    Dim cols() As String
-    Dim clubName As String
-    Dim athleteKey As String
-    Dim athleteRank As String
-    Dim i As Long
-
-    Set clubs = CreateObject("Scripting.Dictionary")
-    clubs.CompareMode = 1
-
-    For i = 1 To lines.Count
-        lineData = lines(i)
-        cols = Split(lineData, ";")
-
-        If UBound(cols) >= 11 Then
-            clubName = Trim(cols(1))
-            athleteRank = Trim(cols(11))
-            athleteKey = Trim(cols(3)) & " " & Trim(cols(4)) & " " & Trim(cols(5)) & "#" & Trim(cols(7))
-
-            If Not clubs.Exists(clubName) Then
-                Set athleteDict = CreateObject("Scripting.Dictionary")
-                clubs.Add clubName, athleteDict
-            Else
-                Set athleteDict = clubs(clubName)
-            End If
-
-            athleteDict.Add athleteKey, athleteRank
-        End If
-    Next i
-
-    Set ParseAthletes = clubs
 End Function

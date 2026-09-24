@@ -1,7 +1,7 @@
 Attribute VB_Name = "ClubSelector"
 Option Explicit
 
-Public Function ShowClubSelector(ByVal clubs As Object) As Collection
+Public Function Show(ByVal clubs As Object) As Collection
     Dim frm As frmClubSelector
     Set frm = New frmClubSelector
 
@@ -9,9 +9,9 @@ Public Function ShowClubSelector(ByVal clubs As Object) As Collection
     frm.Show vbModal
 
     If frm.Cancelled Then
-        Set ShowClubSelector = Nothing
+        Set Show = Nothing
     Else
-        Set ShowClubSelector = frm.Result
+        Set Show = frm.Result
     End If
 
     Unload frm

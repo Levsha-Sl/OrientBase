@@ -1,4 +1,6 @@
-Attribute VB_Name = "Ranks"
+Attribute VB_Name = "RanksData"
+Public Const SHEET_NAME As String = "Ranks"
+
 Public wsRanksData As Worksheet
 ' (STAT)key PERIODAGE
 Private RanksDict As Object
@@ -12,7 +14,7 @@ End Function
 Public Function Init() As Worksheet
     If wsRanksData Is Nothing Then
         ' (STAT)key PERIODAGE
-        Set wsRanksData = DataSheets.GetSheet("Ranks")
+        Set wsRanksData = DataSheets.GetSheet(SHEET_NAME)
         If wsRanksData.Cells(1, 1).value = "" Then
             Call LoadPrimaryRanks
         End If
@@ -21,7 +23,7 @@ Public Function Init() As Worksheet
     Set Init = wsRanksData
 End Function
 
-Public Sub LoadToMart()
+Public Sub LoadToShowcase()
     Dim martArr() As Variant
     Set RanksKeys = CreateObject("Scripting.Dictionary")
     RanksKeys.CompareMode = 1
@@ -69,7 +71,7 @@ Public Sub SaveChanges()
             .Range("A1").Resize(totalRows, TotalCols).value = resultRanks
         End With
     End If
-    Call LoadToMart
+    Call LoadToShowcase
 End Sub
 
 Public Sub UpdateRank(updatedRank As String, periodValue As Long, id As Long)
