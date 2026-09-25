@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "description": "A XVBA App",
     "main": "index.js",
-    "author": "LocalSmart",
-    "license": "ISC",
+    "author": "Vyacheslav Shirnin",
+    "license": "MIT",
     "dependencies": {
         "excel-types": "1.0.0",
         "Xlog": "1.0.0"
