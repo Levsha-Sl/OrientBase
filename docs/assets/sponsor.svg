@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="104" height="32" viewBox="0 0 104 32" role="img" aria-label="Sponsor">
+  <rect x="0.5" y="0.5" width="103" height="31" rx="6" fill="#f6f8fa" stroke="#d1d9e0"/>
+  <path d="M21 23s-8-4.8-8-10a4.3 4.3 0 0 1 8-2.2A4.3 4.3 0 0 1 29 13c0 5.2-8 10-8 10Z" fill="none" stroke="#bf3989" stroke-width="1.5" stroke-linejoin="round"/>
+  <text x="38" y="20.5" fill="#25292e" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="500">Sponsor</text>
+</svg>

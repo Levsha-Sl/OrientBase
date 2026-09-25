@@ -35,10 +35,11 @@ OrientBase собирает сведения в одной базе и позв�
 
 ## Поддержать проект
 
-Если OrientBase помогает вам в работе, вы можете поддержать его развитие:
+Если OrientBase помогает вам в работе, вы можете поддержать его развитие переводом через [ЮMoney](https://yoomoney.ru/to/4100119638410771):
 
-- Через кнопку Sponsor на GitHub: [Sponsor Levsha-Sl/OrientBase](https://github.com/Levsha-Sl/OrientBase/sponsor).
-- Переводом через [ЮMoney](https://yoomoney.ru/to/4100119638410771).
+[![Sponsor — поддержать через ЮMoney](docs/assets/sponsor.svg)](https://yoomoney.ru/to/4100119638410771)
+
+Кнопка выше открывает страницу перевода ЮMoney. Стандартное окно поддержки GitHub можно открыть кнопкой **Sponsor** в верхней части страницы репозитория.
 
 Спасибо за поддержку проекта!
 
