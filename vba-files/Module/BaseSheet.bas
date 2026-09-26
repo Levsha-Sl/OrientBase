@@ -107,6 +107,28 @@ Private Function GetBaseSheet() As Worksheet
                     .HorizontalAlignment = xlLeft
                 End With
 
+                .Range("D3").value = "V 1.0.1"
+
+                Dim BtnReportProblem As Object: Set BtnReportProblem = ws.Buttons.Add( _
+                Left:=ws.Cells(2, 2).Left, _
+                Top:=ws.Cells(2, 2).Top, _
+                Width:=ws.Cells(2, 2).Width + ws.Cells(2, 3).Width, _
+                Height:=ws.Cells(2, 1).Height)
+                With BtnReportProblem
+                    .OnAction = "BaseSheet.BtnReportProblem"
+                    .Caption = "Сообщить о проблеме"
+                End With
+
+                Dim BtnCheckVersion As Object: Set BtnCheckVersion = ws.Buttons.Add( _
+                Left:=ws.Cells(3, 2).Left, _
+                Top:=ws.Cells(3, 2).Top, _
+                Width:=ws.Cells(3, 2).Width + ws.Cells(3, 3).Width, _
+                Height:=ws.Cells(3, 1).Height)
+                With BtnCheckVersion
+                    .OnAction = "BaseSheet.BtnCheckVersion"
+                    .Caption = "Проверить версию"
+                End With
+
                 Dim BtnSave As Object: Set BtnSave = ws.Buttons.Add( _
                 Left:=ws.Cells(1, 5).Left, _
                 Top:=ws.Cells(1, 5).Top, _
@@ -159,6 +181,14 @@ Private Function GetBaseSheet() As Worksheet
         MsgBox "Ошибка при создании листа спортсменнов: " & Err.Description, vbCritical
         Resume CleanExit
 End Function
+
+Private Sub BtnReportProblem()
+    ThisWorkbook.FollowHyperlink Address:="https://github.com/Levsha-Sl/OrientBase/issues/1"
+End Sub
+
+Private Sub BtnCheckVersion()
+    ThisWorkbook.FollowHyperlink Address:="https://github.com/Levsha-Sl/OrientBase/releases"
+End Sub
 
 Private Sub BtnSave()
     If Not tblBase.DataBodyRange Is Nothing Then
